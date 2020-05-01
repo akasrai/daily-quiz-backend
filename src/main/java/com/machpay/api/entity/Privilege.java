@@ -2,6 +2,7 @@ package com.machpay.api.entity;
 
 import com.machpay.api.common.enums.PrivilegeType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -18,6 +19,7 @@ import java.util.Collection;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 public class Privilege {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

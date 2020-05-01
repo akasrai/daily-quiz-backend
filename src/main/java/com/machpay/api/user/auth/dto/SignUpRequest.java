@@ -20,7 +20,8 @@ public class SignUpRequest {
     @Email
     private String email;
 
-    @NotNull
+    private  String countryCode;
+
     @Size(min=6, max=10)
     private String phoneNumber;
 

@@ -1,5 +1,6 @@
 package com.machpay.api.user.member;
 
+import com.machpay.api.common.enums.AuthProvider;
 import com.machpay.api.common.enums.ContactType;
 import com.machpay.api.common.enums.RoleType;
 import com.machpay.api.common.exception.ResourceNotFoundException;
@@ -68,6 +69,7 @@ public class MemberService {
         Role roleUser = roleService.findByName(RoleType.ROLE_USER);
         Member member = memberMapper.toMember(signUpRequest);
 
+        member.setProvider(AuthProvider.SYSTEM);
         member.setReferenceId(generateReferenceId());
         member.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
         member.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
