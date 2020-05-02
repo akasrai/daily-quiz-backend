@@ -24,7 +24,7 @@ public class Member extends User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique=true)
     @Type(type = "uuid-char")
     private UUID referenceId;
 

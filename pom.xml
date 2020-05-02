@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.machpay</groupId>
-    <artifactId>raas-affiliate</artifactId>
+    <artifactId>api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>raas-affiliate</name>
-    <description>RAAS-Affiliate api</description>
+    <name>api</name>
+    <description>Daily Quiz</description>
 
     <profiles>
         <profile>
@@ -117,13 +117,6 @@
             <artifactId>mapstruct-processor</artifactId>
             <version>1.2.0.Final</version>
             <scope>provided</scope>
-        </dependency>
-
-        <!-- RAAS-SDK Dependency-->
-        <dependency>
-            <groupId>com.lftechnology</groupId>
-            <artifactId>raas-sdk</artifactId>
-            <version>0.0.1</version>
         </dependency>
 
         <dependency>
