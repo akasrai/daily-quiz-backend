@@ -21,6 +21,9 @@ public class AdminService {
                 .orElseThrow(() -> new ResourceNotFoundException("admin", "id", email));
     }
 
+    public boolean existsByEmail(String email) {
+        return adminRepository.existsByEmail(email);
+    }
 
     public AdminResponse getCurrentAdmin(String email) {
         Admin admin = findByEmail(email);

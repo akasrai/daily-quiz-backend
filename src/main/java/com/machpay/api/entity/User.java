@@ -38,9 +38,6 @@ public class User extends AuditModel {
     @Column(nullable = false)
     private boolean emailVerified;
 
-    @Column
-    private boolean passwordExpired;
-
     @Column(unique = true)
     private String phoneNumber;
 
@@ -49,6 +46,9 @@ public class User extends AuditModel {
 
     @JsonIgnore
     private String password;
+
+    @Column
+    private boolean passwordExpired;
 
     @Column
     private int loginAttempts;
