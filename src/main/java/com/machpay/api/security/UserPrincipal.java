@@ -55,9 +55,9 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     }
 
     public static List<String> getPrivileges(Collection<Role> roles) {
-
         List<String> privileges = new ArrayList<>();
         List<Privilege> collection = new ArrayList<>();
+
         for (Role role : roles) {
             privileges.add(role.getName().toString());
             collection.addAll(role.getPrivileges());
