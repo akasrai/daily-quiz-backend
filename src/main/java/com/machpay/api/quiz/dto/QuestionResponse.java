@@ -12,5 +12,7 @@ public class QuestionResponse {
 
     private Long point;
 
+    private String category;
+
     private List<AnswerResponse> answers;
 }

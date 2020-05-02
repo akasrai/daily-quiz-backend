@@ -78,7 +78,7 @@ public class QuizService {
     }
 
     public QuestionResponse getLatestQuestion() {
-        QuizQuestion quizQuestion = quizQuestionRepository.findTopByOrderByIdDesc();
+        QuizQuestion quizQuestion = quizQuestionRepository.findFirstByOrderByCreatedAtDesc();
         List<QuizAnswer> quizAnswers = quizAnswerRepository.findAllByQuestion(quizQuestion);
         QuestionResponse questionResponse = quizMapper.toQuestionResponse(quizQuestion);
         questionResponse.setAnswers(quizMapper.toAnswerResponseList(quizAnswers));

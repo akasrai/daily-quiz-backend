@@ -1,6 +1,7 @@
 package com.machpay.api.quiz;
 
 import com.machpay.api.quiz.dto.QuestionRequest;
+import com.machpay.api.quiz.dto.QuestionResponse;
 import com.machpay.api.security.CurrentUser;
 import com.machpay.api.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class QuizController {
 
     @GetMapping("")
     @PreAuthorize("hasAnyRole('USER')")
-    public void getLatestQuestion() {
-        quizService.getLatestQuestion();
+    public QuestionResponse getLatestQuestion() {
+        return quizService.getLatestQuestion();
     }
 }

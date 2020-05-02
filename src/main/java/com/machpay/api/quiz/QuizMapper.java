@@ -7,7 +7,6 @@ import com.machpay.api.quiz.dto.AnswerResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
