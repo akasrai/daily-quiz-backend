@@ -9,8 +9,9 @@ import java.util.List;
 @Getter
 @Setter
 public class QuestionRequest {
+
     @NotNull
-    private  String question;
+    private String question;
 
     @NotNull
     private Long point;
@@ -18,5 +19,15 @@ public class QuestionRequest {
     private String category;
 
     @NotNull
-    private List<AnswerRequest> answers;
+    private List<Answer> answers;
+
+    @Getter
+    @Setter
+    public static class Answer {
+        @NotNull
+        private String answer;
+
+        @NotNull
+        private boolean correct;
+    }
 }

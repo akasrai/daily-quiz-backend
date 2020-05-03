@@ -10,6 +10,8 @@ public final class Constants {
     public static final String VERIFY_EMAIL_ID = "Activate your account";
     public static final String PARSE_ERROR = "Something went wrong while parsing /login request body";
 
+    public static final String INITIAL_QUIZ_SEASON = "The Beginning";
+
     private Constants() {
         throw new IllegalStateException("Constant class");
     }

@@ -1,11 +1,14 @@
 package com.machpay.api.config;
 
+import com.machpay.api.common.Constants;
 import com.machpay.api.common.enums.AuthProvider;
 import com.machpay.api.common.enums.PrivilegeType;
 import com.machpay.api.common.enums.RoleType;
 import com.machpay.api.entity.Admin;
 import com.machpay.api.entity.Privilege;
+import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.entity.Role;
+import com.machpay.api.quiz.repository.QuizSeasonRepository;
 import com.machpay.api.user.admin.AdminRepository;
 import com.machpay.api.user.privilege.PrivilegeRepository;
 import com.machpay.api.user.role.RoleRepository;
@@ -43,6 +46,9 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private QuizSeasonRepository quizSeasonRepository;
+
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -60,6 +66,7 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 
         Role adminRole = roleService.findByName(RoleType.ROLE_ADMIN);
         createAdminIfNotFound(adminRole);
+        createInitialQuizSeason();
 
         alreadySetup = true;
     }
@@ -99,6 +106,17 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
             Role role = new Role(name);
             role.setPrivileges(privileges);
             roleRepository.save(role);
+        }
+    }
+
+    @Transactional
+    public void createInitialQuizSeason() {
+        if (!quizSeasonRepository.existsByTitle(Constants.INITIAL_QUIZ_SEASON)) {
+            QuizSeason quizSeason = new QuizSeason();
+            quizSeason.setTitle(Constants.INITIAL_QUIZ_SEASON);
+            quizSeason.setActive(true);
+
+            quizSeasonRepository.save(quizSeason);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.machpay.api.quiz;
 
+import com.machpay.api.quiz.dto.AnswerRequest;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
 import com.machpay.api.security.CurrentUser;
@@ -31,5 +32,11 @@ public class QuizController {
     @PreAuthorize("hasAnyRole('USER')")
     public QuestionResponse getLatestQuestion() {
         return quizService.getLatestQuestion();
+    }
+
+    @PostMapping("/answer")
+    @PreAuthorize("hasAnyRole('USER')")
+    public boolean answer(@Valid @RequestBody AnswerRequest answerRequest, @CurrentUser UserPrincipal userPrincipal) {
+        return quizService.checkAnswer(answerRequest, userPrincipal.getId());
     }
 }

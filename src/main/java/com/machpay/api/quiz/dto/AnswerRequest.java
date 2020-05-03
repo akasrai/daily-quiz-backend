@@ -4,13 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class AnswerRequest {
     @NotNull
-    private String answer;
+    private UUID question;
 
     @NotNull
-    private boolean correct;
+    private Long answer;
 }

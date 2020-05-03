@@ -2,8 +2,6 @@ package com.machpay.api.quiz;
 
 import com.machpay.api.entity.QuizAnswer;
 import com.machpay.api.entity.QuizQuestion;
-import com.machpay.api.quiz.dto.AnswerRequest;
-import com.machpay.api.quiz.dto.AnswerResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
 import org.mapstruct.Mapper;
@@ -17,11 +15,11 @@ public interface QuizMapper {
 
     QuestionResponse toQuestionResponse(QuizQuestion quizQuestion);
 
-    QuizAnswer toQuizAnswer(AnswerRequest answerRequest);
+    QuizAnswer toQuizAnswer(QuestionRequest.Answer answer);
 
-    List<QuizAnswer> toQuizAnswerList(List<AnswerRequest> answerRequests);
+    List<QuizAnswer> toQuizAnswerList(List<QuestionRequest.Answer> answers);
 
-    AnswerResponse toAnswerResponse(QuizAnswer quizAnswer);
+    QuestionResponse.Answer toAnswerResponse(QuizAnswer quizAnswer);
 
-    List<AnswerResponse> toAnswerResponseList(List<QuizAnswer> quizAnswers);
+    List<QuestionResponse.Answer> toAnswerResponseList(List<QuizAnswer> quizAnswers);
 }
