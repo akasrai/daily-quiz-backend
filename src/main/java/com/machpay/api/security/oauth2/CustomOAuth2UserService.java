@@ -77,7 +77,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private Member registerMember(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
         Member member = new Member();
-        Role roleUser = roleService.findByName(RoleType.ROLE_GUEST);
+        Role roleUser = roleService.findByName(RoleType.ROLE_MEMBER);
 
         member.setProvider(AuthProvider.get(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
         member.setEmailVerified(true);

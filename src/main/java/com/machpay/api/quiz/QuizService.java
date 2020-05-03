@@ -2,6 +2,7 @@ package com.machpay.api.quiz;
 
 import com.machpay.api.common.exception.BadRequestException;
 import com.machpay.api.common.exception.ResourceNotFoundException;
+import com.machpay.api.entity.Member;
 import com.machpay.api.entity.QuizAnswer;
 import com.machpay.api.entity.QuizPlay;
 import com.machpay.api.entity.QuizQuestion;
@@ -10,6 +11,7 @@ import com.machpay.api.entity.User;
 import com.machpay.api.quiz.dto.AnswerRequest;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
+import com.machpay.api.quiz.dto.QuizPlayResponse;
 import com.machpay.api.quiz.repository.QuizAnswerRepository;
 import com.machpay.api.quiz.repository.QuizPlayRepository;
 import com.machpay.api.quiz.repository.QuizQuestionRepository;
@@ -144,5 +146,31 @@ public class QuizService {
         quizPlay.setGamePlayed(Long.valueOf(1));
 
         return quizPlayRepository.save(quizPlay);
+    }
+
+    public List<QuizPlayResponse> getLeaderBoard() {
+        List<QuizPlay> quizPlays = quizPlayRepository.findAllByOrderByPointDesc();
+
+        return getQuizPlayResponse(quizPlays);
+    }
+
+    private List<QuizPlayResponse> getQuizPlayResponse(List<QuizPlay> quizPlays) {
+        return quizPlays.stream().map(quizPlay -> {
+            QuizPlayResponse quizPlayResponse = new QuizPlayResponse();
+            quizPlayResponse.setPoint(quizPlay.getPoint());
+            quizPlayResponse.setGamePlayed(quizPlay.getGamePlayed());
+            quizPlayResponse.setPlayer(getPlayer(quizPlay.getUser()));
+
+            return quizPlayResponse;
+        }).collect(Collectors.toList());
+    }
+
+    private QuizPlayResponse.Player getPlayer(User user) {
+        QuizPlayResponse.Player player = new QuizPlayResponse.Player();
+        Member member = memberService.findById(user.getId());
+        player.setName(member.getFullName());
+        player.setPhoto(member.getImageUrl());
+
+        return player;
     }
 }

@@ -25,7 +25,7 @@ public class MemberController {
     private MemberMapper memberMapper;
 
     @GetMapping("")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('MEMBER')")
     public MemberResponse getCurrentMember(@CurrentUser UserPrincipal userPrincipal) {
         return memberService.getCurrentMember(userPrincipal.getEmail());
     }

@@ -66,7 +66,7 @@ public class MemberService {
     }
 
     public Member create(SignUpRequest signUpRequest) {
-        Role roleUser = roleService.findByName(RoleType.ROLE_USER);
+        Role roleUser = roleService.findByName(RoleType.ROLE_MEMBER);
         Member member = memberMapper.toMember(signUpRequest);
 
         member.setProvider(AuthProvider.SYSTEM);
@@ -78,7 +78,7 @@ public class MemberService {
     }
 
     public Member updateOauth2Member(Oauth2SignupRequest oauth2SignupRequest, Member member) {
-        Role roleUser = roleService.findByName(RoleType.ROLE_USER);
+        Role roleUser = roleService.findByName(RoleType.ROLE_MEMBER);
         member.setPhoneNumber(oauth2SignupRequest.getPhoneNumber());
         member.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
 

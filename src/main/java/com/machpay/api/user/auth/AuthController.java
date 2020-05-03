@@ -62,7 +62,7 @@ public class AuthController {
     }
 
     @GetMapping("/resend-verification/{type}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('MEMBER')")
     public void resendVerification(@CurrentUser UserPrincipal userPrincipal,
                                    @PathVariable("type") ContactType contactType) {
         contactVerificationService.createDeviceVerification(userPrincipal.getId(), contactType);
@@ -75,8 +75,8 @@ public class AuthController {
     }
 
     @PostMapping("/oauth")
-    @PreAuthorize("hasRole('GUEST')")
-    public MemberResponse completeOauth2Signup(@Valid @RequestBody Oauth2SignupRequest oauth2SignupRequest,
+    @PreAuthorize("hasRole('MEMBER')")
+    public MemberResponse completeOauth2SignUp(@Valid @RequestBody Oauth2SignupRequest oauth2SignupRequest,
                                                @CurrentUser UserPrincipal userPrincipal) {
         return authService.completeOauth2SignUp(oauth2SignupRequest, userPrincipal);
     }
@@ -104,7 +104,7 @@ public class AuthController {
     }
 
     @PutMapping("/reset-password")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PreAuthorize("hasAnyRole('ADMIN','MEMBER')")
     public VerificationResponse resetLoggedInUserPassword(@CurrentUser UserPrincipal userPrincipal,
                                                           @RequestBody @Valid ResetPasswordRequest resetPasswordRequest) {
         return passwordService.resetPassword(userPrincipal, resetPasswordRequest.getNewPassword(),

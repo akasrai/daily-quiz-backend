@@ -61,7 +61,7 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
         List<Privilege> readWritePrivilege = Arrays.asList(readPrivilege, writePrivilege);
 
         createRoleIfNotFound(RoleType.ROLE_ADMIN, readWritePrivilege);
-        createRoleIfNotFound(RoleType.ROLE_USER, readWritePrivilege);
+        createRoleIfNotFound(RoleType.ROLE_MEMBER, readWritePrivilege);
         createRoleIfNotFound(RoleType.ROLE_GUEST, readWritePrivilege);
 
         Role adminRole = roleService.findByName(RoleType.ROLE_ADMIN);
