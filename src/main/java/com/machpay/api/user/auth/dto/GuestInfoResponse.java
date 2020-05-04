@@ -9,5 +9,5 @@ public class GuestInfoResponse {
 
     private String email;
 
-    private String imageUrl;
+    private String photo;
 }

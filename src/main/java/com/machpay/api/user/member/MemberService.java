@@ -6,7 +6,7 @@ import com.machpay.api.common.enums.RoleType;
 import com.machpay.api.common.exception.ResourceNotFoundException;
 import com.machpay.api.entity.Member;
 import com.machpay.api.entity.Role;
-import com.machpay.api.user.auth.dto.Oauth2SignupRequest;
+import com.machpay.api.user.auth.dto.Oauth2SignUpRequest;
 import com.machpay.api.user.auth.dto.SignUpRequest;
 import com.machpay.api.user.member.dto.MemberResponse;
 import com.machpay.api.user.role.RoleService;
@@ -57,12 +57,16 @@ public class MemberService {
                 .orElseThrow(() -> new ResourceNotFoundException("Member", "id", email));
     }
 
-    public Boolean isEmailDuplicate(String email) {
+    public boolean isEmailDuplicate(String email) {
         return memberRepository.existsByEmail(email);
     }
 
-    public Boolean isPhoneDuplicate(String phoneNumber) {
+    public boolean isPhoneDuplicate(String phoneNumber) {
         return memberRepository.existsByPhoneNumber(phoneNumber);
+    }
+
+    public boolean existsByEmail(String email) {
+        return memberRepository.existsByEmail(email);
     }
 
     public Member create(SignUpRequest signUpRequest) {
@@ -77,7 +81,7 @@ public class MemberService {
         return save(member);
     }
 
-    public Member updateOauth2Member(Oauth2SignupRequest oauth2SignupRequest, Member member) {
+    public Member updateOauth2Member(Oauth2SignUpRequest oauth2SignupRequest, Member member) {
         Role roleUser = roleService.findByName(RoleType.ROLE_MEMBER);
         member.setPhoneNumber(oauth2SignupRequest.getPhoneNumber());
         member.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
@@ -116,7 +120,7 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    private UUID generateReferenceId() {
+    public UUID generateReferenceId() {
         return UUID.randomUUID();
     }
 }

@@ -41,7 +41,7 @@ public class Member extends User {
     private String fullName;
 
     @Column(length = 1000)
-    private String imageUrl;
+    private String photo;
 
     public String getFullName() {
         return Stream

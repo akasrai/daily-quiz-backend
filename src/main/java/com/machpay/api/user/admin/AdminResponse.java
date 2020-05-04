@@ -22,7 +22,7 @@ public class AdminResponse {
 
     private String phoneNumber;
 
-    private String imageUrl;
+    private String photo;
 
     private List<String> roles;
 }

@@ -15,6 +15,7 @@ public class AppConfig {
 
     public static class Auth {
         private String tokenSecret;
+
         private long tokenExpirationMsec;
 
         public String getTokenSecret() {

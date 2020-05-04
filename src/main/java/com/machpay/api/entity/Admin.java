@@ -35,7 +35,7 @@ public class Admin extends User {
     private String fullName;
 
     @Column
-    private String imageUrl;
+    private String photo;
 
     public String getFullName() {
         return Stream

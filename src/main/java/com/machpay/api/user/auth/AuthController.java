@@ -8,7 +8,7 @@ import com.machpay.api.user.auth.dto.AccessTokenRequest;
 import com.machpay.api.user.auth.dto.AccessTokenResponse;
 import com.machpay.api.user.auth.dto.AuthResponse;
 import com.machpay.api.user.auth.dto.LoginRequest;
-import com.machpay.api.user.auth.dto.Oauth2SignupRequest;
+import com.machpay.api.user.auth.dto.Oauth2SignUpRequest;
 import com.machpay.api.user.auth.dto.SignUpRequest;
 import com.machpay.api.user.member.dto.MemberResponse;
 import com.machpay.api.user.password.ForgotPasswordRequest;
@@ -37,22 +37,30 @@ public class AuthController {
     private AuthService authService;
 
     @Autowired
+    private PasswordService passwordService;
+
+    @Autowired
     private AuthTokenService authTokenService;
 
     @Autowired
     private ContactVerificationService contactVerificationService;
 
     @Autowired
-    private PasswordService passwordService;
+    private MobileAppGoogleAuthService mobileAppGoogleAuthService;
 
     @PostMapping("/signin")
-    public AuthResponse authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest);
+    public AuthResponse signIn(@Valid @RequestBody LoginRequest loginRequest) {
+        return authService.signIn(loginRequest);
     }
 
     @PostMapping("/users")
-    public AuthResponse registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public AuthResponse signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         return authService.signUp(signUpRequest);
+    }
+
+    @GetMapping("/google/{idToken}")
+    public AuthResponse mobileAppSignInWithGoogle(@PathVariable("idToken") String idToken) {
+        return mobileAppGoogleAuthService.signIn(idToken);
     }
 
     @GetMapping("/verify/{type}/{token}")
@@ -76,7 +84,7 @@ public class AuthController {
 
     @PostMapping("/oauth")
     @PreAuthorize("hasRole('MEMBER')")
-    public MemberResponse completeOauth2SignUp(@Valid @RequestBody Oauth2SignupRequest oauth2SignupRequest,
+    public MemberResponse completeOauth2SignUp(@Valid @RequestBody Oauth2SignUpRequest oauth2SignupRequest,
                                                @CurrentUser UserPrincipal userPrincipal) {
         return authService.completeOauth2SignUp(oauth2SignupRequest, userPrincipal);
     }

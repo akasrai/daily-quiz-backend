@@ -65,7 +65,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             sender = senderOptional.get();
             if (!sender.getProvider().equals(AuthProvider.get(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
                 throw new OAuth2AuthenticationProcessingException(String.format("Looks like you're signed up with %s " +
-                        "account. Please use your %s account to login.", sender.getProvider(), sender.getProvider()));
+                        "account. Please use your %s account to signIn.", sender.getProvider(), sender.getProvider()));
             }
             sender = updateExistingMember(sender, oAuth2UserInfo);
         } else {
@@ -83,7 +83,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         member.setEmailVerified(true);
         member.setEmail(oAuth2UserInfo.getEmail());
         member.setProviderId(oAuth2UserInfo.getId());
-        member.setImageUrl(oAuth2UserInfo.getImageUrl());
+        member.setPhoto(oAuth2UserInfo.getImageUrl());
         member.setLastName(oAuth2UserInfo.getLastName());
         member.setFirstName(oAuth2UserInfo.getFirstName());
         member.setMiddleName(oAuth2UserInfo.getMiddleName());
@@ -93,7 +93,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private Member updateExistingMember(Member existingMember, OAuth2UserInfo oAuth2UserInfo) {
-        existingMember.setImageUrl(oAuth2UserInfo.getImageUrl());
+        existingMember.setPhoto(oAuth2UserInfo.getImageUrl());
         existingMember.setLastName(oAuth2UserInfo.getLastName());
         existingMember.setFirstName(oAuth2UserInfo.getFirstName());
         existingMember.setMiddleName(oAuth2UserInfo.getMiddleName());

@@ -20,5 +20,5 @@ public class MemberResponse {
 
     private String phoneNumber;
 
-    private String imageUrl;
+    private String photo;
 }

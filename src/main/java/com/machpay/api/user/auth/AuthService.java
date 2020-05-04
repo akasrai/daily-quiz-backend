@@ -14,7 +14,7 @@ import com.machpay.api.user.auth.dto.AccessTokenRequest;
 import com.machpay.api.user.auth.dto.AccessTokenResponse;
 import com.machpay.api.user.auth.dto.AuthResponse;
 import com.machpay.api.user.auth.dto.LoginRequest;
-import com.machpay.api.user.auth.dto.Oauth2SignupRequest;
+import com.machpay.api.user.auth.dto.Oauth2SignUpRequest;
 import com.machpay.api.user.auth.dto.SignUpRequest;
 import com.machpay.api.user.member.MemberMapper;
 import com.machpay.api.user.member.MemberService;
@@ -38,13 +38,19 @@ import java.util.stream.Collectors;
 @Service
 public class AuthService {
     @Autowired
-    private MemberService memberService;
+    private UserService userService;
 
     @Autowired
     private MemberMapper memberMapper;
 
     @Autowired
+    private MemberService memberService;
+
+    @Autowired
     private TokenProvider tokenProvider;
+
+    @Autowired
+    private AuthTokenService authTokenService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -52,15 +58,9 @@ public class AuthService {
     @Autowired
     private ContactVerificationService contactVerificationService;
 
-    @Autowired
-    private AuthTokenService authTokenService;
-
-    @Autowired
-    private UserService userService;
-
     private Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    public AuthResponse login(LoginRequest loginRequest) {
+    public AuthResponse signIn(LoginRequest loginRequest) {
         String token = authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         User user = userService.findByEmail(loginRequest.getEmail());
 
@@ -112,7 +112,7 @@ public class AuthService {
         return memberMapper.toMemberResponse(member);
     }
 
-    public MemberResponse completeOauth2SignUp(Oauth2SignupRequest oauth2SignupRequest,
+    public MemberResponse completeOauth2SignUp(Oauth2SignUpRequest oauth2SignupRequest,
                                                UserPrincipal userPrincipal) {
         if (memberService.isPhoneDuplicate(oauth2SignupRequest.getPhoneNumber())) {
             throw new BadRequestException("Phone number already in use.");

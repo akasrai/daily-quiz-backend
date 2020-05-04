@@ -169,7 +169,7 @@ public class QuizService {
         QuizPlayResponse.Player player = new QuizPlayResponse.Player();
         Member member = memberService.findById(user.getId());
         player.setName(member.getFullName());
-        player.setPhoto(member.getImageUrl());
+        player.setPhoto(member.getPhoto());
 
         return player;
     }
