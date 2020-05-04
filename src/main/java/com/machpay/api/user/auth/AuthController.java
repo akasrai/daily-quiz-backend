@@ -1,16 +1,13 @@
 package com.machpay.api.user.auth;
 
 import com.machpay.api.common.enums.ContactType;
-import com.machpay.api.redis.AuthTokenService;
 import com.machpay.api.security.CurrentUser;
 import com.machpay.api.security.UserPrincipal;
 import com.machpay.api.user.auth.dto.AccessTokenRequest;
 import com.machpay.api.user.auth.dto.AccessTokenResponse;
 import com.machpay.api.user.auth.dto.AuthResponse;
-import com.machpay.api.user.auth.dto.LoginRequest;
-import com.machpay.api.user.auth.dto.Oauth2SignUpRequest;
+import com.machpay.api.user.auth.dto.SignInRequest;
 import com.machpay.api.user.auth.dto.SignUpRequest;
-import com.machpay.api.user.member.dto.MemberResponse;
 import com.machpay.api.user.password.ForgotPasswordRequest;
 import com.machpay.api.user.password.PasswordService;
 import com.machpay.api.user.password.ResetPasswordRequest;
@@ -40,17 +37,14 @@ public class AuthController {
     private PasswordService passwordService;
 
     @Autowired
-    private AuthTokenService authTokenService;
-
-    @Autowired
     private ContactVerificationService contactVerificationService;
 
     @Autowired
     private MobileAppGoogleAuthService mobileAppGoogleAuthService;
 
     @PostMapping("/signin")
-    public AuthResponse signIn(@Valid @RequestBody LoginRequest loginRequest) {
-        return authService.signIn(loginRequest);
+    public AuthResponse signIn(@Valid @RequestBody SignInRequest signInRequest) {
+        return authService.signIn(signInRequest);
     }
 
     @PostMapping("/users")
@@ -76,28 +70,10 @@ public class AuthController {
         contactVerificationService.createDeviceVerification(userPrincipal.getId(), contactType);
     }
 
-    @GetMapping("/guest")
-    @PreAuthorize("hasRole('READ')")
-    public MemberResponse getGuestInfo(@CurrentUser UserPrincipal userPrincipal) {
-        return authService.getGuestInfo(userPrincipal.getId());
-    }
-
-    @PostMapping("/oauth")
-    @PreAuthorize("hasRole('MEMBER')")
-    public MemberResponse completeOauth2SignUp(@Valid @RequestBody Oauth2SignUpRequest oauth2SignupRequest,
-                                               @CurrentUser UserPrincipal userPrincipal) {
-        return authService.completeOauth2SignUp(oauth2SignupRequest, userPrincipal);
-    }
-
     @GetMapping("/signout")
     @PreAuthorize("hasRole('READ')")
-    public void logOut(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-
-        if (authHeader != null) {
-            String referenceToken = authHeader.replace("Bearer", "").trim();
-            authTokenService.deleteAuthTokenByReferenceToken(referenceToken);
-        }
+    public void signOut(HttpServletRequest request) {
+       authService.signOut(request);
     }
 
     @PostMapping("/forgot-password")

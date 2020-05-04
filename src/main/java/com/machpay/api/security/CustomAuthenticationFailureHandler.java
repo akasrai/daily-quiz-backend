@@ -5,7 +5,7 @@ import com.machpay.api.common.Messages;
 import com.machpay.api.common.enums.AuthProvider;
 import com.machpay.api.entity.User;
 import com.machpay.api.user.UserService;
-import com.machpay.api.user.auth.dto.LoginRequest;
+import com.machpay.api.user.auth.dto.SignInRequest;
 import com.machpay.api.util.HttpServletRequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
@@ -60,7 +60,7 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
     private Integer getRemainingLoginAttempts(HttpServletRequest request) {
         byte[] bytes = HttpServletRequestUtils.getRequestReaderByte(request);
-        LoginRequest authRequest = HttpServletRequestUtils.getAuthRequest(bytes);
+        SignInRequest authRequest = HttpServletRequestUtils.getAuthRequest(bytes);
 
         return Constants.MAX_LOGIN_LIMIT - userService.getLoginAttempts(authRequest.getEmail());
     }

@@ -81,14 +81,6 @@ public class MemberService {
         return save(member);
     }
 
-    public Member updateOauth2Member(Oauth2SignUpRequest oauth2SignupRequest, Member member) {
-        Role roleUser = roleService.findByName(RoleType.ROLE_MEMBER);
-        member.setPhoneNumber(oauth2SignupRequest.getPhoneNumber());
-        member.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
-
-        return save(member);
-    }
-
     public Member save(Member sender) {
         return memberRepository.save(sender);
     }

@@ -3,7 +3,7 @@ package com.machpay.api.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.machpay.api.cachedrequest.CachedBodyServletInputStream;
 import com.machpay.api.common.Constants;
-import com.machpay.api.user.auth.dto.LoginRequest;
+import com.machpay.api.user.auth.dto.SignInRequest;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,12 +34,12 @@ public class HttpServletRequestUtils {
         }
     }
 
-    public static LoginRequest getAuthRequest(byte[] bytes) {
+    public static SignInRequest getAuthRequest(byte[] bytes) {
         try {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
             String requestBody = IOUtils.toString(byteArrayInputStream, "UTF-8");
 
-            return objectMapper.readValue(requestBody, LoginRequest.class);
+            return objectMapper.readValue(requestBody, SignInRequest.class);
         } catch (IOException e) {
             logger.error(Constants.PARSE_ERROR, e);
             throw new InternalAuthenticationServiceException(Constants.PARSE_ERROR, e);

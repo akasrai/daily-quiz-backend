@@ -62,7 +62,6 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 
         createRoleIfNotFound(RoleType.ROLE_ADMIN, readWritePrivilege);
         createRoleIfNotFound(RoleType.ROLE_MEMBER, readWritePrivilege);
-        createRoleIfNotFound(RoleType.ROLE_GUEST, readWritePrivilege);
 
         Role adminRole = roleService.findByName(RoleType.ROLE_ADMIN);
         createAdminIfNotFound(adminRole);

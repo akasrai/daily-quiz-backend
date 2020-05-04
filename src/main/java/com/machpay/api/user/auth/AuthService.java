@@ -13,12 +13,9 @@ import com.machpay.api.user.UserService;
 import com.machpay.api.user.auth.dto.AccessTokenRequest;
 import com.machpay.api.user.auth.dto.AccessTokenResponse;
 import com.machpay.api.user.auth.dto.AuthResponse;
-import com.machpay.api.user.auth.dto.LoginRequest;
-import com.machpay.api.user.auth.dto.Oauth2SignUpRequest;
+import com.machpay.api.user.auth.dto.SignInRequest;
 import com.machpay.api.user.auth.dto.SignUpRequest;
-import com.machpay.api.user.member.MemberMapper;
 import com.machpay.api.user.member.MemberService;
-import com.machpay.api.user.member.dto.MemberResponse;
 import com.machpay.api.user.verification.ContactVerificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,22 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private MemberMapper memberMapper;
 
     @Autowired
     private MemberService memberService;
@@ -60,9 +51,9 @@ public class AuthService {
 
     private Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    public AuthResponse signIn(LoginRequest loginRequest) {
-        String token = authenticate(loginRequest.getEmail(), loginRequest.getPassword());
-        User user = userService.findByEmail(loginRequest.getEmail());
+    public AuthResponse signIn(SignInRequest signInRequest) {
+        String token = authenticate(signInRequest.getEmail(), signInRequest.getPassword());
+        User user = userService.findByEmail(signInRequest.getEmail());
 
         return buildAuthResponse(user, token);
     }
@@ -80,6 +71,15 @@ public class AuthService {
         contactVerificationService.createDeviceVerification(member.getId(), ContactType.PHONE);
 
         return buildAuthResponse(member, token);
+    }
+
+    public void signOut(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null) {
+            String referenceToken = authHeader.replace("Bearer", "").trim();
+            authTokenService.deleteAuthTokenByReferenceToken(referenceToken);
+        }
     }
 
     private String authenticate(String email, String password) {
@@ -104,41 +104,6 @@ public class AuthService {
                 .collect(Collectors.toList()));
 
         return authResponse;
-    }
-
-    public MemberResponse getGuestInfo(Long senderId) {
-        Member member = memberService.findById(senderId);
-
-        return memberMapper.toMemberResponse(member);
-    }
-
-    public MemberResponse completeOauth2SignUp(Oauth2SignUpRequest oauth2SignupRequest,
-                                               UserPrincipal userPrincipal) {
-        if (memberService.isPhoneDuplicate(oauth2SignupRequest.getPhoneNumber())) {
-            throw new BadRequestException("Phone number already in use.");
-        }
-
-        Member member = memberService.findById(userPrincipal.getId());
-        member = memberService.updateOauth2Member(oauth2SignupRequest, member);
-        grantNewAuthentication(member);
-        contactVerificationService.createDeviceVerification(member.getId(), ContactType.PHONE);
-
-        return memberMapper.toMemberResponse(member);
-    }
-
-    private void grantNewAuthentication(Member sender) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authentication.getAuthorities());
-        List<String> privileges = UserPrincipal.getPrivileges(sender.getRoles());
-
-        for (String privilege : privileges) {
-            updatedAuthorities.add(new SimpleGrantedAuthority(privilege));
-        }
-
-        Authentication newAuthentication = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(),
-                authentication.getCredentials(),
-                updatedAuthorities);
-        SecurityContextHolder.getContext().setAuthentication(newAuthentication);
     }
 
     public AccessTokenResponse refreshAccessToken(AccessTokenRequest accessTokenRequest) {

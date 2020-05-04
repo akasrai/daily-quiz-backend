@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class LoginRequest {
+public class SignInRequest {
     @NotBlank
     @Email
     private String email;

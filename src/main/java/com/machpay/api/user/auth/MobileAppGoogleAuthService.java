@@ -38,16 +38,16 @@ public class MobileAppGoogleAuthService {
     private String googleSecretId;
 
     @Autowired
-    private MemberService memberService;
-
-    @Autowired
-    private TokenProvider tokenProvider;
-
-    @Autowired
     private AuthService authService;
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private MemberService memberService;
+
+    @Autowired
+    private TokenProvider tokenProvider;
 
     @Autowired
     MobileAppGoogleAuthService(MobileAppConfig mobileAppConfig) {

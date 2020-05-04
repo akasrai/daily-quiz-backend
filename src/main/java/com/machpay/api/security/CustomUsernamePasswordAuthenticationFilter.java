@@ -1,6 +1,6 @@
 package com.machpay.api.security;
 
-import com.machpay.api.user.auth.dto.LoginRequest;
+import com.machpay.api.user.auth.dto.SignInRequest;
 import com.machpay.api.util.HttpServletRequestUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,7 +15,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         byte[] bytes = HttpServletRequestUtils.getRequestReaderByte(request);
-        LoginRequest authRequest = HttpServletRequestUtils.getAuthRequest(bytes);
+        SignInRequest authRequest = HttpServletRequestUtils.getAuthRequest(bytes);
         UsernamePasswordAuthenticationToken token
                 = new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword());
         setDetails(request, token);
