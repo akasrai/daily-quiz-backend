@@ -21,7 +21,7 @@ public class QuoteController {
     private QuoteService quoteService;
 
     @PostMapping("")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PreAuthorize("hasAnyRole('ADMIN','MEMBER')")
     public void create(@Valid @RequestBody QuoteRequest quoteRequest, @CurrentUser UserPrincipal userPrincipal) {
         quoteService.create(quoteRequest, userPrincipal.getId());
     }
