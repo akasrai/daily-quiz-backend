@@ -13,4 +13,6 @@ public interface QuizAnswerRepository extends JpaRepository<QuizAnswer, Long> {
     List<QuizAnswer> findAllByQuestion(QuizQuestion quizQuestion);
 
     Optional<QuizAnswer> findByQuestionAndId(QuizQuestion question, Long id);
+
+    Optional<QuizAnswer> findByQuestionAndCorrectTrue(QuizQuestion question);
 }

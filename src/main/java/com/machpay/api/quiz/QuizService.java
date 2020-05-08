@@ -9,6 +9,7 @@ import com.machpay.api.entity.QuizQuestion;
 import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.entity.User;
 import com.machpay.api.quiz.dto.AnswerRequest;
+import com.machpay.api.quiz.dto.AnswerResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
 import com.machpay.api.quiz.dto.QuizPlayResponse;
@@ -56,6 +57,10 @@ public class QuizService {
 
     public QuizAnswer findAnswerByQuestionAndId(QuizQuestion question, Long id) {
         return quizAnswerRepository.findByQuestionAndId(question, id).orElseThrow(() -> new ResourceNotFoundException("Answer", "id", id));
+    }
+
+    public QuizAnswer findByQuestionAndCorrectTrue(QuizQuestion question) {
+        return quizAnswerRepository.findByQuestionAndCorrectTrue(question).orElseThrow(() -> new ResourceNotFoundException("Answer", "question id", question.getId()));
     }
 
     public QuizQuestion findQuestionById(UUID id) {
@@ -110,15 +115,25 @@ public class QuizService {
     }
 
     @Transactional
-    public boolean checkAnswer(AnswerRequest answerRequest, Long userId) {
+    public AnswerResponse checkAnswer(AnswerRequest answerRequest, Long userId) {
         User user = userService.findById(userId);
         QuizQuestion quizQuestion = findQuestionById(answerRequest.getQuestion());
-        QuizAnswer quizAnswer = findAnswerByQuestionAndId(quizQuestion, answerRequest.getAnswer());
+        QuizAnswer playerAnswer = findAnswerByQuestionAndId(quizQuestion, answerRequest.getAnswer());
+        QuizAnswer correctAnswer = findByQuestionAndCorrectTrue(quizQuestion);
 
-        if (quizAnswer.isCorrect())
+        if (playerAnswer.isCorrect())
             updateQuizPlay(user, quizQuestion.getPoint());
 
-        return quizAnswer.isCorrect();
+
+        return buildAnswerResponse(playerAnswer, correctAnswer);
+    }
+
+    private AnswerResponse buildAnswerResponse(QuizAnswer playerAnswer, QuizAnswer correctAnswer) {
+        AnswerResponse answerResponse = new AnswerResponse();
+        answerResponse.setCorrect(playerAnswer.isCorrect());
+        answerResponse.setCorrectAnswer(correctAnswer.getId());
+
+        return answerResponse;
     }
 
     public QuizSeason getActiveSeason() {

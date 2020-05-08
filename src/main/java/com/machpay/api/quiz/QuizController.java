@@ -2,6 +2,7 @@ package com.machpay.api.quiz;
 
 import com.machpay.api.common.ListResponse;
 import com.machpay.api.quiz.dto.AnswerRequest;
+import com.machpay.api.quiz.dto.AnswerResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
 import com.machpay.api.quiz.dto.QuizPlayResponse;
@@ -39,7 +40,7 @@ public class QuizController {
 
     @PostMapping("/answer")
     @PreAuthorize("hasRole('MEMBER')")
-    public boolean answer(@Valid @RequestBody AnswerRequest answerRequest, @CurrentUser UserPrincipal userPrincipal) {
+    public AnswerResponse answer(@Valid @RequestBody AnswerRequest answerRequest, @CurrentUser UserPrincipal userPrincipal) {
         return quizService.checkAnswer(answerRequest, userPrincipal.getId());
     }
 
