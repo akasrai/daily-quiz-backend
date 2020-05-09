@@ -10,6 +10,7 @@ import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.entity.User;
 import com.machpay.api.quiz.dto.AnswerRequest;
 import com.machpay.api.quiz.dto.AnswerResponse;
+import com.machpay.api.quiz.dto.PlayerCurrentStatusResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
 import com.machpay.api.quiz.dto.QuizPlayResponse;
@@ -18,6 +19,7 @@ import com.machpay.api.quiz.repository.QuizPlayRepository;
 import com.machpay.api.quiz.repository.QuizQuestionRepository;
 import com.machpay.api.quiz.repository.QuizResultRepository;
 import com.machpay.api.quiz.repository.QuizSeasonRepository;
+import com.machpay.api.security.UserPrincipal;
 import com.machpay.api.user.UserService;
 import com.machpay.api.user.member.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,5 +189,31 @@ public class QuizService {
         player.setPhoto(member.getPhoto());
 
         return player;
+    }
+
+    public PlayerCurrentStatusResponse getPlayerCurrentStatus(UserPrincipal userPrincipal) {
+        Member member = memberService.findByEmail(userPrincipal.getEmail());
+        List<QuizPlay> quizPlays = quizPlayRepository.findAllByOrderByPointDesc();
+
+        return calculateGamePosition(member, quizPlays);
+    }
+
+    private PlayerCurrentStatusResponse calculateGamePosition(Member member,List<QuizPlay> quizPlays) {
+        int position = 0;
+        PlayerCurrentStatusResponse playerCurrentStatusResponse = new PlayerCurrentStatusResponse();
+
+        for (QuizPlay quizPlay : quizPlays) {
+            position++;
+
+            if (member.equals(quizPlay.getUser())) {
+                playerCurrentStatusResponse.setPosition(position);
+                playerCurrentStatusResponse.setPoint(quizPlay.getPoint());
+                playerCurrentStatusResponse.setGamePlayed(quizPlay.getGamePlayed());
+
+                break;
+            }
+        }
+
+        return playerCurrentStatusResponse;
     }
 }

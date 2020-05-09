@@ -3,6 +3,7 @@ package com.machpay.api.quiz;
 import com.machpay.api.common.ListResponse;
 import com.machpay.api.quiz.dto.AnswerRequest;
 import com.machpay.api.quiz.dto.AnswerResponse;
+import com.machpay.api.quiz.dto.PlayerCurrentStatusResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
 import com.machpay.api.quiz.dto.QuizPlayResponse;
@@ -40,16 +41,22 @@ public class QuizController {
 
     @PostMapping("/answer")
     @PreAuthorize("hasRole('MEMBER')")
-    public AnswerResponse answer(@Valid @RequestBody AnswerRequest answerRequest, @CurrentUser UserPrincipal userPrincipal) {
+    public AnswerResponse answer(@Valid @RequestBody AnswerRequest answerRequest,
+                                 @CurrentUser UserPrincipal userPrincipal) {
         return quizService.checkAnswer(answerRequest, userPrincipal.getId());
     }
 
     @GetMapping("/leaderboard")
-    @PreAuthorize("hasAnyRole('MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     public ListResponse getLeaderBoard() {
         List<QuizPlayResponse> quizPlayResponseList = quizService.getLeaderBoard();
 
         return new ListResponse(quizPlayResponseList);
     }
 
+    @GetMapping("/current/status")
+    @PreAuthorize("hasRole('MEMBER')")
+    public PlayerCurrentStatusResponse getPlayerCurrentStatus(@CurrentUser UserPrincipal userPrincipal) {
+        return quizService.getPlayerCurrentStatus(userPrincipal);
+    }
 }
