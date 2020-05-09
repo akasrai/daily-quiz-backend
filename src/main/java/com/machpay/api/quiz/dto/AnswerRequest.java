@@ -14,4 +14,7 @@ public class AnswerRequest {
 
     @NotNull
     private Long answer;
+
+    @NotNull
+    private Long timeTaken;
 }

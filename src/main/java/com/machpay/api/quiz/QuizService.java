@@ -124,7 +124,7 @@ public class QuizService {
         QuizAnswer correctAnswer = findByQuestionAndCorrectTrue(quizQuestion);
 
         if (playerAnswer.isCorrect())
-            updateQuizPlay(user, quizQuestion.getPoint());
+            updateQuizPlay(user, quizQuestion.getPoint(), answerRequest.getTimeTaken());
 
 
         return buildAnswerResponse(playerAnswer, correctAnswer);
@@ -144,7 +144,7 @@ public class QuizService {
     }
 
     @Transactional
-    public QuizPlay updateQuizPlay(User user, Long point) {
+    public QuizPlay updateQuizPlay(User user, Long point, Long timeTaken) {
         QuizSeason quizSeason = getActiveSeason();
         Optional<QuizPlay> existingPoints = quizPlayRepository.findByUserAndSeason(user, quizSeason);
 
@@ -152,6 +152,7 @@ public class QuizService {
             QuizPlay existingQuizPlay = existingPoints.get();
             existingQuizPlay.setPoint(existingQuizPlay.getPoint() + point);
             existingQuizPlay.setGamePlayed(existingQuizPlay.getGamePlayed() + 1);
+            existingQuizPlay.setTimeTaken(existingQuizPlay.getTimeTaken() + timeTaken);
 
             return quizPlayRepository.save(existingQuizPlay);
         }
@@ -160,13 +161,14 @@ public class QuizService {
         quizPlay.setUser(user);
         quizPlay.setPoint(point);
         quizPlay.setSeason(quizSeason);
+        quizPlay.setTimeTaken(timeTaken);
         quizPlay.setGamePlayed(Long.valueOf(1));
 
         return quizPlayRepository.save(quizPlay);
     }
 
     public List<QuizPlayResponse> getLeaderBoard() {
-        List<QuizPlay> quizPlays = quizPlayRepository.findAllByOrderByPointDesc();
+        List<QuizPlay> quizPlays = quizPlayRepository.findAllByOrderByPointDescTimeTakenAsc();
 
         return getQuizPlayResponse(quizPlays);
     }
@@ -193,7 +195,7 @@ public class QuizService {
 
     public PlayerCurrentStatusResponse getPlayerCurrentStatus(UserPrincipal userPrincipal) {
         Member member = memberService.findByEmail(userPrincipal.getEmail());
-        List<QuizPlay> quizPlays = quizPlayRepository.findAllByOrderByPointDesc();
+        List<QuizPlay> quizPlays = quizPlayRepository.findAllByOrderByPointDescTimeTakenAsc();
 
         return calculateGamePosition(member, quizPlays);
     }

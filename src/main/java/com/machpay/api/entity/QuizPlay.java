@@ -18,16 +18,19 @@ import javax.persistence.ManyToOne;
 @Entity
 @Setter
 @Getter
-public class QuizPlay extends AuditModel{
+public class QuizPlay extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private Long point;
+    private Long point = Long.valueOf(0);
 
     @Column
-    private Long gamePlayed;
+    private Long gamePlayed = Long.valueOf(0);
+
+    @Column
+    private Long timeTaken = Long.valueOf(0);
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
