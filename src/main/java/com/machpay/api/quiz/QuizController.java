@@ -1,12 +1,11 @@
 package com.machpay.api.quiz;
 
-import com.machpay.api.common.ListResponse;
 import com.machpay.api.quiz.dto.AnswerRequest;
 import com.machpay.api.quiz.dto.AnswerResponse;
 import com.machpay.api.quiz.dto.CurrentPlayerStatsResponse;
+import com.machpay.api.quiz.dto.LeaderBoardResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
-import com.machpay.api.quiz.dto.QuizPlayResponse;
 import com.machpay.api.quiz.dto.QuizSeasonRequest;
 import com.machpay.api.security.CurrentUser;
 import com.machpay.api.security.UserPrincipal;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/quiz")
@@ -56,10 +54,8 @@ public class QuizController {
 
     @GetMapping("/leaderboard")
     @PreAuthorize("hasRole('MEMBER')")
-    public ListResponse getLeaderBoard() {
-        List<QuizPlayResponse> quizPlayResponseList = quizPlayService.getLeaderBoard();
-
-        return new ListResponse(quizPlayResponseList);
+    public LeaderBoardResponse getLeaderBoard() {
+        return quizPlayService.getLeaderBoard();
     }
 
     @GetMapping("/current/stats")

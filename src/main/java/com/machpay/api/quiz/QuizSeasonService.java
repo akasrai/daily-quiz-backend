@@ -21,10 +21,14 @@ public class QuizSeasonService {
     private QuizResultService quizResultService;
 
     @Autowired
-    private  QuizSeasonService quizSeasonService;
+    private QuizSeasonService quizSeasonService;
 
     @Autowired
     private QuizSeasonRepository quizSeasonRepository;
+
+    public boolean isSeasonActive(QuizSeason currentSeason) {
+        return quizSeasonRepository.existsByTitleAndActiveTrue(currentSeason.getTitle());
+    }
 
     @Transactional
     public void create(QuizSeasonRequest quizSeasonRequest) {

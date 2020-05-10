@@ -1,10 +1,14 @@
 package com.machpay.api.quiz;
 
+import com.machpay.api.common.enums.ResultType;
+import com.machpay.api.common.exception.ResourceNotFoundException;
 import com.machpay.api.entity.Member;
 import com.machpay.api.entity.QuizPlay;
+import com.machpay.api.entity.QuizResult;
 import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.entity.User;
 import com.machpay.api.quiz.dto.CurrentPlayerStatsResponse;
+import com.machpay.api.quiz.dto.LeaderBoardResponse;
 import com.machpay.api.quiz.dto.QuizPlayResponse;
 import com.machpay.api.quiz.repository.QuizPlayRepository;
 import com.machpay.api.security.UserPrincipal;
@@ -27,6 +31,9 @@ public class QuizPlayService {
     private MemberService memberService;
 
     @Autowired
+    private QuizResultService quizResultService;
+
+    @Autowired
     private QuizSeasonService quizSeasonService;
 
     @Autowired
@@ -42,6 +49,11 @@ public class QuizPlayService {
 
     public List<QuizPlay> getAllByPosition(QuizSeason quizSeason) {
         return quizPlayRepository.findAllBySeasonOrderByPointDescTimeTakenAsc(quizSeason);
+    }
+
+    public QuizPlay findByUserAndSeason(User user, QuizSeason season) {
+        return quizPlayRepository.findByUserAndSeason(user, season).orElseThrow(() -> new ResourceNotFoundException(
+                "User", "user id", user.getId()));
     }
 
     public boolean isEligible(UserPrincipal userPrincipal) {
@@ -132,11 +144,36 @@ public class QuizPlayService {
         return currentPlayerStatsResponse;
     }
 
-    public List<QuizPlayResponse> getLeaderBoard() {
+    public LeaderBoardResponse getLeaderBoard() {
         QuizSeason currentSeason = quizSeasonService.getActiveSeason();
-        List<QuizPlay> quizPlays = getAllByPosition(currentSeason);
 
-        return getQuizPlayResponse(quizPlays);
+        if (quizSeasonService.isSeasonActive(currentSeason)) {
+            List<QuizPlay> quizPlays = getAllByPosition(currentSeason);
+
+            return getLeaderBoardResponse(quizPlays, ResultType.SEASON_LEADER_BOARD);
+        }
+
+        List<QuizResult> results = quizResultService.getWinnersBySeason(currentSeason);
+
+        return getLeaderBoardResponse(getQuizPlayFromWinners(results), ResultType.SEASON_WINNERS);
+    }
+
+    private List<QuizPlay> getQuizPlayFromWinners(List<QuizResult> results) {
+        return results.stream().map(quizResult -> {
+            User user = quizResult.getWinner();
+            QuizSeason quizSeason = quizResult.getSeason();
+
+            return findByUserAndSeason(user, quizSeason);
+        }).collect(Collectors.toList());
+
+    }
+
+    private LeaderBoardResponse getLeaderBoardResponse(List<QuizPlay> quizPlays, ResultType resultType) {
+        LeaderBoardResponse leaderBoardResponse = new LeaderBoardResponse();
+        leaderBoardResponse.setType(resultType.name());
+        leaderBoardResponse.setResults(getQuizPlayResponse(quizPlays));
+
+        return leaderBoardResponse;
     }
 
     private List<QuizPlayResponse> getQuizPlayResponse(List<QuizPlay> quizPlays) {

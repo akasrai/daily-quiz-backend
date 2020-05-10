@@ -11,4 +11,6 @@ public interface QuizSeasonRepository extends JpaRepository<QuizSeason, Long> {
     Optional<QuizSeason> findFirstByActiveTrue();
 
     boolean existsByTitle(String title);
+
+    boolean existsByTitleAndActiveTrue(String title);
 }
