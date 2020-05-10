@@ -54,9 +54,15 @@ public class QuizController {
         return new ListResponse(quizPlayResponseList);
     }
 
-    @GetMapping("/current/status")
+    @GetMapping("/current/stats")
     @PreAuthorize("hasRole('MEMBER')")
     public PlayerCurrentStatusResponse getPlayerCurrentStatus(@CurrentUser UserPrincipal userPrincipal) {
         return quizService.getPlayerCurrentStatus(userPrincipal);
+    }
+
+    @GetMapping("/permission")
+    @PreAuthorize("hasRole('MEMBER')")
+    public boolean isEligible(@CurrentUser UserPrincipal userPrincipal) {
+        return quizService.isEligible(userPrincipal);
     }
 }

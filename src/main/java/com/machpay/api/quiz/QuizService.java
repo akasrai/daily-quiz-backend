@@ -95,10 +95,12 @@ public class QuizService {
 
     @Transactional
     public void createAnswers(QuizQuestion question, List<QuestionRequest.Answer> answers) {
+        QuizSeason quizSeason = getActiveSeason();
         List<QuizAnswer> quizAnswers = quizMapper.toQuizAnswerList(answers);
         quizAnswers = quizAnswers.stream().map(answer -> setQuestion(question, answer)).collect(Collectors.toList());
 
         quizAnswerRepository.saveAll(quizAnswers);
+        quizPlayRepository.unLockByQuizSeason(quizSeason);
     }
 
     private QuizAnswer setQuestion(QuizQuestion question, QuizAnswer answer) {
@@ -123,10 +125,13 @@ public class QuizService {
         QuizAnswer playerAnswer = findAnswerByQuestionAndId(quizQuestion, answerRequest.getAnswer());
         QuizAnswer correctAnswer = findByQuestionAndCorrectTrue(quizQuestion);
 
-        if (playerAnswer.isCorrect())
+        if (playerAnswer.isCorrect()) {
             updateQuizPlay(user, quizQuestion.getPoint(), answerRequest.getTimeTaken());
 
+            return buildAnswerResponse(playerAnswer, correctAnswer);
+        }
 
+        lockPlayerForQuiz(user);
         return buildAnswerResponse(playerAnswer, correctAnswer);
     }
 
@@ -144,12 +149,26 @@ public class QuizService {
     }
 
     @Transactional
+    public void lockPlayerForQuiz(User user) {
+        QuizSeason quizSeason = getActiveSeason();
+        Optional<QuizPlay> existingPoints = quizPlayRepository.findByUserAndSeason(user, quizSeason);
+
+        if (existingPoints.isPresent()) {
+            QuizPlay existingQuizPlay = existingPoints.get();
+            existingQuizPlay.setLocked(true);
+
+            quizPlayRepository.save(existingQuizPlay);
+        }
+    }
+
+    @Transactional
     public QuizPlay updateQuizPlay(User user, Long point, Long timeTaken) {
         QuizSeason quizSeason = getActiveSeason();
         Optional<QuizPlay> existingPoints = quizPlayRepository.findByUserAndSeason(user, quizSeason);
 
         if (existingPoints.isPresent()) {
             QuizPlay existingQuizPlay = existingPoints.get();
+            existingQuizPlay.setLocked(true);
             existingQuizPlay.setPoint(existingQuizPlay.getPoint() + point);
             existingQuizPlay.setGamePlayed(existingQuizPlay.getGamePlayed() + 1);
             existingQuizPlay.setTimeTaken(existingQuizPlay.getTimeTaken() + timeTaken);
@@ -160,6 +179,7 @@ public class QuizService {
         QuizPlay quizPlay = new QuizPlay();
         quizPlay.setUser(user);
         quizPlay.setPoint(point);
+        quizPlay.setLocked(true);
         quizPlay.setSeason(quizSeason);
         quizPlay.setTimeTaken(timeTaken);
         quizPlay.setGamePlayed(Long.valueOf(1));
@@ -200,7 +220,7 @@ public class QuizService {
         return calculateGamePosition(member, quizPlays);
     }
 
-    private PlayerCurrentStatusResponse calculateGamePosition(Member member,List<QuizPlay> quizPlays) {
+    private PlayerCurrentStatusResponse calculateGamePosition(Member member, List<QuizPlay> quizPlays) {
         int position = 0;
         PlayerCurrentStatusResponse playerCurrentStatusResponse = new PlayerCurrentStatusResponse();
 
@@ -217,5 +237,17 @@ public class QuizService {
         }
 
         return playerCurrentStatusResponse;
+    }
+
+    public boolean isEligible(UserPrincipal userPrincipal) {
+        QuizSeason quizSeason = getActiveSeason();
+        Member member = memberService.findByEmail(userPrincipal.getEmail());
+        Optional<QuizPlay> quizPlay = quizPlayRepository.findByUserAndSeason(member, quizSeason);
+
+        if (quizPlay.isPresent()) {
+            return !quizPlay.get().isLocked();
+        }
+
+        return true;
     }
 }

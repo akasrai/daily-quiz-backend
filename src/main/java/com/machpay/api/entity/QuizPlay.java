@@ -32,6 +32,9 @@ public class QuizPlay extends AuditModel {
     @Column
     private Long timeTaken = Long.valueOf(0);
 
+    @Column
+    private boolean locked;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
