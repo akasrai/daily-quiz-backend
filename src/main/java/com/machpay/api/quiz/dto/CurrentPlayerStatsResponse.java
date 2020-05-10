@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PlayerCurrentStatusResponse {
+public class CurrentPlayerStatsResponse {
     private Long point;
 
     private int position;

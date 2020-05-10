@@ -3,10 +3,11 @@ package com.machpay.api.quiz;
 import com.machpay.api.common.ListResponse;
 import com.machpay.api.quiz.dto.AnswerRequest;
 import com.machpay.api.quiz.dto.AnswerResponse;
-import com.machpay.api.quiz.dto.PlayerCurrentStatusResponse;
+import com.machpay.api.quiz.dto.CurrentPlayerStatsResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
 import com.machpay.api.quiz.dto.QuizPlayResponse;
+import com.machpay.api.quiz.dto.QuizSeasonRequest;
 import com.machpay.api.security.CurrentUser;
 import com.machpay.api.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,45 +25,58 @@ import java.util.List;
 @RequestMapping("/v1/quiz")
 public class QuizController {
     @Autowired
-    private QuizService quizService;
+    private QuizPlayService quizPlayService;
+
+    @Autowired
+    private QuizSeasonService quizSeasonService;
+
+    @Autowired
+    private QuizQuestionAnswerService quizQuestionAnswerService;
+
 
     @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     public void createQuiz(@Valid @RequestBody QuestionRequest questionRequest,
                            @CurrentUser UserPrincipal userPrincipal) {
-        quizService.createQuestion(questionRequest, userPrincipal.getId());
+        quizQuestionAnswerService.createQuestion(questionRequest, userPrincipal.getId());
     }
 
     @GetMapping("")
     @PreAuthorize("hasRole('MEMBER')")
     public QuestionResponse getLatestQuestion() {
-        return quizService.getLatestQuestion();
+        return quizQuestionAnswerService.getLatestQuestion();
     }
 
     @PostMapping("/answer")
     @PreAuthorize("hasRole('MEMBER')")
     public AnswerResponse answer(@Valid @RequestBody AnswerRequest answerRequest,
                                  @CurrentUser UserPrincipal userPrincipal) {
-        return quizService.checkAnswer(answerRequest, userPrincipal.getId());
+        return quizQuestionAnswerService.checkAnswer(answerRequest, userPrincipal.getId());
     }
 
     @GetMapping("/leaderboard")
     @PreAuthorize("hasRole('MEMBER')")
     public ListResponse getLeaderBoard() {
-        List<QuizPlayResponse> quizPlayResponseList = quizService.getLeaderBoard();
+        List<QuizPlayResponse> quizPlayResponseList = quizPlayService.getLeaderBoard();
 
         return new ListResponse(quizPlayResponseList);
     }
 
     @GetMapping("/current/stats")
     @PreAuthorize("hasRole('MEMBER')")
-    public PlayerCurrentStatusResponse getPlayerCurrentStatus(@CurrentUser UserPrincipal userPrincipal) {
-        return quizService.getPlayerCurrentStatus(userPrincipal);
+    public CurrentPlayerStatsResponse getPlayerCurrentStats(@CurrentUser UserPrincipal userPrincipal) {
+        return quizPlayService.getCurrentPlayerStats(userPrincipal);
     }
 
     @GetMapping("/permission")
     @PreAuthorize("hasRole('MEMBER')")
     public boolean isEligible(@CurrentUser UserPrincipal userPrincipal) {
-        return quizService.isEligible(userPrincipal);
+        return quizPlayService.isEligible(userPrincipal);
+    }
+
+    @PostMapping("/host/season")
+    @PreAuthorize(("hasRole('ADMIN')"))
+    public void hostNewSeason(@Valid @RequestBody QuizSeasonRequest quizSeasonRequest) {
+        quizSeasonService.hostNewSeason(quizSeasonRequest);
     }
 }

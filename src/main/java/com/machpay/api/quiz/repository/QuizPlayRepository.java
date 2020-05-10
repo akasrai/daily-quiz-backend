@@ -21,6 +21,8 @@ public interface QuizPlayRepository extends JpaRepository<QuizPlay, Long> {
 
     List<QuizPlay> findAllByOrderByPointDescTimeTakenAsc();
 
+    List<QuizPlay> findTop3ByOrderByPointDescTimeTakenAsc();
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE QuizPlay q SET q.locked=false WHERE q.season=:quizSeason")
