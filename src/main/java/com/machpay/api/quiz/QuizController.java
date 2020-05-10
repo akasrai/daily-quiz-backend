@@ -43,8 +43,8 @@ public class QuizController {
 
     @GetMapping("")
     @PreAuthorize("hasRole('MEMBER')")
-    public QuestionResponse getLatestQuestion() {
-        return quizQuestionAnswerService.getLatestQuestion();
+    public QuestionResponse getLatestQuestion(@CurrentUser UserPrincipal userPrincipal) {
+        return quizQuestionAnswerService.getLatestQuestion(userPrincipal);
     }
 
     @PostMapping("/answer")

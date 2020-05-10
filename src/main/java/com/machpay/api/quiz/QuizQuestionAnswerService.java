@@ -13,6 +13,7 @@ import com.machpay.api.quiz.dto.QuestionResponse;
 import com.machpay.api.quiz.repository.QuizAnswerRepository;
 import com.machpay.api.quiz.repository.QuizPlayRepository;
 import com.machpay.api.quiz.repository.QuizQuestionRepository;
+import com.machpay.api.security.UserPrincipal;
 import com.machpay.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,9 +43,12 @@ public class QuizQuestionAnswerService {
     @Autowired
     private QuizAnswerRepository quizAnswerRepository;
 
-
     @Autowired
     private QuizQuestionRepository quizQuestionRepository;
+
+    public boolean existBySeason(QuizSeason season) {
+        return quizQuestionRepository.existsBySeason(season);
+    }
 
     public QuizAnswer findAnswerByQuestionAndId(QuizQuestion question, Long id) {
         return quizAnswerRepository.findByQuestionAndId(question, id).orElseThrow(() -> new ResourceNotFoundException("Answer", "id", id));
@@ -63,8 +67,10 @@ public class QuizQuestionAnswerService {
     public void createQuestion(QuestionRequest questionRequest, Long userId) {
         validateAnswers(questionRequest.getAnswers());
         User user = userService.findById(userId);
+        QuizSeason currentSeason = quizSeasonService.getActiveSeason();
         QuizQuestion quizQuestion = quizMapper.toQuizQuestion(questionRequest);
         quizQuestion.setUser(user);
+        quizQuestion.setSeason(currentSeason);
 
         quizQuestionRepository.save(quizQuestion);
         createAnswers(quizQuestion, questionRequest.getAnswers());
@@ -98,11 +104,14 @@ public class QuizQuestionAnswerService {
         return answer;
     }
 
-    public QuestionResponse getLatestQuestion() {
-        QuizQuestion quizQuestion = quizQuestionRepository.findFirstByOrderByCreatedAtDesc();
+    public QuestionResponse getLatestQuestion(UserPrincipal userPrincipal) {
+        User user = userService.findByEmail(userPrincipal.getEmail());
+        QuizSeason currentSeason = quizSeasonService.getActiveSeason();
+        QuizQuestion quizQuestion = quizQuestionRepository.findFirstBySeasonOrderByCreatedAtDesc(currentSeason);
         List<QuizAnswer> quizAnswers = quizAnswerRepository.findAllByQuestion(quizQuestion);
         QuestionResponse questionResponse = quizMapper.toQuestionResponse(quizQuestion);
         questionResponse.setAnswers(quizMapper.toAnswerResponseList(quizAnswers));
+        quizPlayService.lockPlayerForQuiz(user);
 
         return questionResponse;
     }
@@ -116,11 +125,8 @@ public class QuizQuestionAnswerService {
 
         if (playerAnswer.isCorrect()) {
             quizPlayService.updateQuizPlay(user, quizQuestion.getPoint(), answerRequest.getTimeTaken());
-
-            return buildAnswerResponse(playerAnswer, correctAnswer);
         }
 
-        quizPlayService.lockPlayerForQuiz(user);
         return buildAnswerResponse(playerAnswer, correctAnswer);
     }
 

@@ -19,9 +19,9 @@ public interface QuizPlayRepository extends JpaRepository<QuizPlay, Long> {
 
     Optional<QuizPlay> findByUserAndSeason(User user, QuizSeason season);
 
-    List<QuizPlay> findAllByOrderByPointDescTimeTakenAsc();
+    List<QuizPlay> findAllBySeasonOrderByPointDescTimeTakenAsc(QuizSeason season);
 
-    List<QuizPlay> findTop3ByOrderByPointDescTimeTakenAsc();
+    List<QuizPlay> findTop3BySeasonOrderByPointDescTimeTakenAsc(QuizSeason season);
 
     @Transactional
     @Modifying(clearAutomatically = true)

@@ -6,10 +6,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CurrentPlayerStatsResponse {
-    private Long point;
+    private int position = 0;
 
-    private int position;
+    private Long point = Long.valueOf(0);
 
-    private Long gamePlayed;
+    private Long gamePlayed = Long.valueOf(0);
 
 }

@@ -21,6 +21,9 @@ public class QuizSeasonService {
     private QuizResultService quizResultService;
 
     @Autowired
+    private  QuizSeasonService quizSeasonService;
+
+    @Autowired
     private QuizSeasonRepository quizSeasonRepository;
 
     @Transactional
@@ -47,7 +50,8 @@ public class QuizSeasonService {
     @Transactional
     public void declareCurrentSeasonWinner() {
         int position = 0;
-        List<QuizPlay> quizPlays = quizPlayService.getTop3QuizPlay();
+        QuizSeason currentSeason = quizSeasonService.getActiveSeason();
+        List<QuizPlay> quizPlays = quizPlayService.getTop3QuizPlay(currentSeason);
 
         for (QuizPlay quizPlay : quizPlays) {
             position++;

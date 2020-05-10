@@ -32,25 +32,32 @@ public class QuizPlayService {
     @Autowired
     private QuizPlayRepository quizPlayRepository;
 
+    @Autowired
+    private QuizQuestionAnswerService quizQuestionAnswerService;
 
-    public List<QuizPlay> getTop3QuizPlay() {
-        return quizPlayRepository.findTop3ByOrderByPointDescTimeTakenAsc();
+
+    public List<QuizPlay> getTop3QuizPlay(QuizSeason quizSeason) {
+        return quizPlayRepository.findTop3BySeasonOrderByPointDescTimeTakenAsc(quizSeason);
     }
 
-    public List<QuizPlay> getAllByPosition() {
-        return quizPlayRepository.findAllByOrderByPointDescTimeTakenAsc();
+    public List<QuizPlay> getAllByPosition(QuizSeason quizSeason) {
+        return quizPlayRepository.findAllBySeasonOrderByPointDescTimeTakenAsc(quizSeason);
     }
 
     public boolean isEligible(UserPrincipal userPrincipal) {
         QuizSeason quizSeason = quizSeasonService.getActiveSeason();
-        User user = userService.findByEmail(userPrincipal.getEmail());
-        Optional<QuizPlay> quizPlay = quizPlayRepository.findByUserAndSeason(user, quizSeason);
+        if (quizQuestionAnswerService.existBySeason(quizSeason)) {
+            User user = userService.findByEmail(userPrincipal.getEmail());
+            Optional<QuizPlay> quizPlay = quizPlayRepository.findByUserAndSeason(user, quizSeason);
 
-        if (quizPlay.isPresent()) {
-            return !quizPlay.get().isLocked();
+            if (quizPlay.isPresent()) {
+                return !quizPlay.get().isLocked();
+            }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     @Transactional
@@ -60,23 +67,13 @@ public class QuizPlayService {
 
         if (existingPoints.isPresent()) {
             QuizPlay existingQuizPlay = existingPoints.get();
-            existingQuizPlay.setLocked(true);
             existingQuizPlay.setPoint(existingQuizPlay.getPoint() + point);
-            existingQuizPlay.setGamePlayed(existingQuizPlay.getGamePlayed() + 1);
             existingQuizPlay.setTimeTaken(existingQuizPlay.getTimeTaken() + timeTaken);
 
             return quizPlayRepository.save(existingQuizPlay);
         }
 
-        QuizPlay quizPlay = new QuizPlay();
-        quizPlay.setUser(user);
-        quizPlay.setPoint(point);
-        quizPlay.setLocked(true);
-        quizPlay.setSeason(quizSeason);
-        quizPlay.setTimeTaken(timeTaken);
-        quizPlay.setGamePlayed(Long.valueOf(1));
-
-        return quizPlayRepository.save(quizPlay);
+        return createQuizPlay(user, quizSeason);
     }
 
     @Transactional
@@ -87,13 +84,30 @@ public class QuizPlayService {
         if (existingPoints.isPresent()) {
             QuizPlay existingQuizPlay = existingPoints.get();
             existingQuizPlay.setLocked(true);
+            existingQuizPlay.setGamePlayed(existingQuizPlay.getGamePlayed() + 1);
 
             quizPlayRepository.save(existingQuizPlay);
         }
+
+        createQuizPlay(user, quizSeason);
+    }
+
+    @Transactional
+    public QuizPlay createQuizPlay(User user, QuizSeason quizSeason) {
+        QuizPlay quizPlay = new QuizPlay();
+        quizPlay.setUser(user);
+        quizPlay.setLocked(true);
+        quizPlay.setSeason(quizSeason);
+        quizPlay.setPoint(Long.valueOf(0));
+        quizPlay.setTimeTaken(Long.valueOf(0));
+        quizPlay.setGamePlayed(Long.valueOf(1));
+
+        return quizPlayRepository.save(quizPlay);
     }
 
     public CurrentPlayerStatsResponse getCurrentPlayerStats(UserPrincipal userPrincipal) {
-        List<QuizPlay> quizPlays = getAllByPosition();
+        QuizSeason currentSeason = quizSeasonService.getActiveSeason();
+        List<QuizPlay> quizPlays = getAllByPosition(currentSeason);
         User user = userService.findByEmail(userPrincipal.getEmail());
 
         return calculateGamePosition(user, quizPlays);
@@ -119,7 +133,9 @@ public class QuizPlayService {
     }
 
     public List<QuizPlayResponse> getLeaderBoard() {
-        List<QuizPlay> quizPlays = getAllByPosition();
+        QuizSeason currentSeason = quizSeasonService.getActiveSeason();
+        List<QuizPlay> quizPlays = getAllByPosition(currentSeason);
+
         return getQuizPlayResponse(quizPlays);
     }
 
