@@ -29,12 +29,12 @@ public class QuizSeasonService {
     private QuizSeasonRepository quizSeasonRepository;
 
     @Transactional
-    public void create(QuizSeasonRequest quizSeasonRequest) {
+    public QuizSeason create(QuizSeasonRequest quizSeasonRequest) {
         QuizSeason quizSeason = new QuizSeason();
         quizSeason.setTitle(quizSeasonRequest.getSeason());
         quizSeason.setActive(true);
 
-        quizSeasonRepository.save(quizSeason);
+        return quizSeasonRepository.save(quizSeason);
     }
 
     public QuizSeason getActiveSeason() {
@@ -47,11 +47,11 @@ public class QuizSeasonService {
     }
 
     @Transactional
-    public void hostNewSeason(QuizSeasonRequest quizSeasonRequest) {
+    public QuizSeason hostNewSeason(QuizSeasonRequest quizSeasonRequest) {
         Optional<QuizSeason> currentSeason = quizSeasonService.findActiveSeason();
 
-        if(!currentSeason.isPresent()) {
-            create(quizSeasonRequest);
+        if (!currentSeason.isPresent()) {
+            return create(quizSeasonRequest);
         }
 
         throw new BadRequestException("A season is currently running");

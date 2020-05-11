@@ -1,5 +1,6 @@
 package com.machpay.api.quiz;
 
+import com.machpay.api.common.exception.BadRequestException;
 import com.machpay.api.entity.QuizPlay;
 import com.machpay.api.entity.QuizResult;
 import com.machpay.api.quiz.repository.QuizResultRepository;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class QuizResultService {
@@ -25,6 +27,12 @@ public class QuizResultService {
     }
 
     public List<QuizResult> getWinnersBySeason() {
-        return quizResultRepository.findTop3ByOrderByPositionAsc();
+        Optional<QuizResult> quizResult = quizResultRepository.findFirstByOrderByCreatedAtDesc();
+
+        if (quizResult.isPresent()) {
+            return quizResultRepository.findTop3BySeasonOrderByPositionAsc(quizResult.get().getSeason());
+        }
+
+        throw new BadRequestException("There's no any result yet");
     }
 }
