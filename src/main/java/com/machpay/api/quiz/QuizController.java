@@ -70,6 +70,12 @@ public class QuizController {
         return quizPlayService.isEligible(userPrincipal);
     }
 
+    @GetMapping("/end/season")
+    @PreAuthorize(("hasRole('ADMIN')"))
+    public void endCurrentSeason() {
+        quizSeasonService.endCurrentSeason();
+    }
+
     @PostMapping("/host/season")
     @PreAuthorize(("hasRole('ADMIN')"))
     public void hostNewSeason(@Valid @RequestBody QuizSeasonRequest quizSeasonRequest) {

@@ -57,16 +57,21 @@ public class QuizPlayService {
     }
 
     public boolean isEligible(UserPrincipal userPrincipal) {
-        QuizSeason quizSeason = quizSeasonService.getActiveSeason();
-        if (quizQuestionAnswerService.existBySeason(quizSeason)) {
-            User user = userService.findByEmail(userPrincipal.getEmail());
-            Optional<QuizPlay> quizPlay = quizPlayRepository.findByUserAndSeason(user, quizSeason);
+        Optional<QuizSeason> currentSeason = quizSeasonService.findActiveSeason();
 
-            if (quizPlay.isPresent()) {
-                return !quizPlay.get().isLocked();
+        if(currentSeason.isPresent()) {
+            if (quizQuestionAnswerService.existBySeason(currentSeason.get())) {
+                User user = userService.findByEmail(userPrincipal.getEmail());
+                Optional<QuizPlay> quizPlay = quizPlayRepository.findByUserAndSeason(user, currentSeason.get());
+
+                if (quizPlay.isPresent()) {
+                    return !quizPlay.get().isLocked();
+                }
+
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         return false;
@@ -118,11 +123,16 @@ public class QuizPlayService {
     }
 
     public CurrentPlayerStatsResponse getCurrentPlayerStats(UserPrincipal userPrincipal) {
-        QuizSeason currentSeason = quizSeasonService.getActiveSeason();
-        List<QuizPlay> quizPlays = getAllByPosition(currentSeason);
-        User user = userService.findByEmail(userPrincipal.getEmail());
+       Optional<QuizSeason> currentSeason = quizSeasonService.findActiveSeason();
 
-        return calculateGamePosition(user, quizPlays);
+       if(currentSeason.isPresent()) {
+           List<QuizPlay> quizPlays = getAllByPosition(currentSeason.get());
+           User user = userService.findByEmail(userPrincipal.getEmail());
+
+           return calculateGamePosition(user, quizPlays);
+       }
+
+       return new CurrentPlayerStatsResponse();
     }
 
     private CurrentPlayerStatsResponse calculateGamePosition(User user, List<QuizPlay> quizPlays) {
@@ -145,15 +155,15 @@ public class QuizPlayService {
     }
 
     public LeaderBoardResponse getLeaderBoard() {
-        QuizSeason currentSeason = quizSeasonService.getActiveSeason();
+      Optional<QuizSeason> currentSeason = quizSeasonService.findActiveSeason();
 
-        if (quizSeasonService.isSeasonActive(currentSeason)) {
-            List<QuizPlay> quizPlays = getAllByPosition(currentSeason);
+        if (currentSeason.isPresent()) {
+            List<QuizPlay> quizPlays = getAllByPosition(currentSeason.get());
 
             return getLeaderBoardResponse(quizPlays, ResultType.SEASON_LEADER_BOARD);
         }
 
-        List<QuizResult> results = quizResultService.getWinnersBySeason(currentSeason);
+        List<QuizResult> results = quizResultService.getWinnersBySeason();
 
         return getLeaderBoardResponse(getQuizPlayFromWinners(results), ResultType.SEASON_WINNERS);
     }

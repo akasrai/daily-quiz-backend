@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
-    List<QuizResult> findAllBySeason(QuizSeason quizSeason);
+    List<QuizResult> findTop3ByOrderByPositionAsc();
 }

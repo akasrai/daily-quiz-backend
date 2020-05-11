@@ -17,6 +17,8 @@ import java.util.Optional;
 public interface QuizPlayRepository extends JpaRepository<QuizPlay, Long> {
     Optional<QuizPlay> findByUser(User user);
 
+    boolean existsBySeason(QuizSeason quizSeason);
+
     Optional<QuizPlay> findByUserAndSeason(User user, QuizSeason season);
 
     List<QuizPlay> findAllBySeasonOrderByPointDescTimeTakenAsc(QuizSeason season);

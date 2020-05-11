@@ -1,5 +1,6 @@
 package com.machpay.api.quiz;
 
+import com.machpay.api.common.exception.BadRequestException;
 import com.machpay.api.common.exception.ResourceNotFoundException;
 import com.machpay.api.entity.QuizPlay;
 import com.machpay.api.entity.QuizSeason;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class QuizSeasonService {
@@ -26,10 +28,6 @@ public class QuizSeasonService {
     @Autowired
     private QuizSeasonRepository quizSeasonRepository;
 
-    public boolean isSeasonActive(QuizSeason currentSeason) {
-        return quizSeasonRepository.existsByTitleAndActiveTrue(currentSeason.getTitle());
-    }
-
     @Transactional
     public void create(QuizSeasonRequest quizSeasonRequest) {
         QuizSeason quizSeason = new QuizSeason();
@@ -44,11 +42,19 @@ public class QuizSeasonService {
                 "Season", "active", true));
     }
 
+    public Optional<QuizSeason> findActiveSeason() {
+        return quizSeasonRepository.findFirstByActiveTrue();
+    }
+
     @Transactional
     public void hostNewSeason(QuizSeasonRequest quizSeasonRequest) {
-        declareCurrentSeasonWinner();
-        endCurrentSeason();
-        create(quizSeasonRequest);
+        Optional<QuizSeason> currentSeason = quizSeasonService.findActiveSeason();
+
+        if(!currentSeason.isPresent()) {
+            create(quizSeasonRequest);
+        }
+
+        throw new BadRequestException("A season is currently running");
     }
 
     @Transactional
@@ -65,9 +71,11 @@ public class QuizSeasonService {
 
     @Transactional
     public void endCurrentSeason() {
+        declareCurrentSeasonWinner();
         QuizSeason quizSeason = getActiveSeason();
         quizSeason.setActive(false);
 
         quizSeasonRepository.save(quizSeason);
+
     }
 }

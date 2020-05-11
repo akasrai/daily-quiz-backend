@@ -2,7 +2,6 @@ package com.machpay.api.quiz;
 
 import com.machpay.api.entity.QuizPlay;
 import com.machpay.api.entity.QuizResult;
-import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.quiz.repository.QuizResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,7 @@ public class QuizResultService {
         quizResultRepository.save(quizResult);
     }
 
-    public List<QuizResult> getWinnersBySeason(QuizSeason season) {
-        return quizResultRepository.findAllBySeason(season);
+    public List<QuizResult> getWinnersBySeason() {
+        return quizResultRepository.findTop3ByOrderByPositionAsc();
     }
 }
