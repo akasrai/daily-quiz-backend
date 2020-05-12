@@ -3,6 +3,7 @@ package com.machpay.api.quiz;
 import com.machpay.api.common.exception.BadRequestException;
 import com.machpay.api.common.exception.ResourceNotFoundException;
 import com.machpay.api.entity.QuizAnswer;
+import com.machpay.api.entity.QuizPlay;
 import com.machpay.api.entity.QuizQuestion;
 import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.entity.User;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -119,6 +121,7 @@ public class QuizQuestionAnswerService {
     @Transactional
     public AnswerResponse checkAnswer(AnswerRequest answerRequest, Long userId) {
         User user = userService.findById(userId);
+        checkIfPlayerIsEligible(user);
         QuizQuestion quizQuestion = findQuestionById(answerRequest.getQuestion());
         QuizAnswer playerAnswer = findAnswerByQuestionAndId(quizQuestion, answerRequest.getAnswer());
         QuizAnswer correctAnswer = findByQuestionAndCorrectTrue(quizQuestion);
@@ -128,6 +131,15 @@ public class QuizQuestionAnswerService {
         }
 
         return buildAnswerResponse(playerAnswer, correctAnswer);
+    }
+
+    public void checkIfPlayerIsEligible(User user) {
+        QuizSeason quizSeason = quizSeasonService.getActiveSeason();
+        Optional<QuizPlay> existingPoints = quizPlayRepository.findByUserAndSeason(user, quizSeason);
+
+        if (existingPoints.isPresent() && existingPoints.get().isLocked()) {
+            throw new BadRequestException("You have already played the quiz for today");
+        }
     }
 
     private AnswerResponse buildAnswerResponse(QuizAnswer playerAnswer, QuizAnswer correctAnswer) {
