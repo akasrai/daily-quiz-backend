@@ -1,6 +1,7 @@
 package com.machpay.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.machpay.api.common.enums.QuizPlayStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -34,6 +37,10 @@ public class QuizPlay extends AuditModel {
 
     @Column
     private boolean locked;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private QuizPlayStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)

@@ -1,5 +1,6 @@
 package com.machpay.api.quiz;
 
+import com.machpay.api.common.enums.QuizPlayStatus;
 import com.machpay.api.common.exception.BadRequestException;
 import com.machpay.api.common.exception.ResourceNotFoundException;
 import com.machpay.api.entity.QuizAnswer;
@@ -97,7 +98,7 @@ public class QuizQuestionAnswerService {
         quizAnswers = quizAnswers.stream().map(answer -> setQuestion(question, answer)).collect(Collectors.toList());
 
         quizAnswerRepository.saveAll(quizAnswers);
-        quizPlayRepository.unLockByQuizSeason(quizSeason);
+        quizPlayRepository.unLockByQuizSeason(quizSeason, QuizPlayStatus.READY_FOR_NEW_PLAY);
     }
 
     private QuizAnswer setQuestion(QuizQuestion question, QuizAnswer answer) {
@@ -113,7 +114,7 @@ public class QuizQuestionAnswerService {
         List<QuizAnswer> quizAnswers = quizAnswerRepository.findAllByQuestion(quizQuestion);
         QuestionResponse questionResponse = quizMapper.toQuestionResponse(quizQuestion);
         questionResponse.setAnswers(quizMapper.toAnswerResponseList(quizAnswers));
-        quizPlayService.lockPlayerForQuiz(user);
+        quizPlayService.updatePlayerQuizStatus(user, QuizPlayStatus.SEEN_QUESTION);
 
         return questionResponse;
     }
@@ -126,9 +127,11 @@ public class QuizQuestionAnswerService {
         QuizAnswer playerAnswer = findAnswerByQuestionAndId(quizQuestion, answerRequest.getAnswer());
         QuizAnswer correctAnswer = findByQuestionAndCorrectTrue(quizQuestion);
 
-        if (playerAnswer.isCorrect()) {
-            quizPlayService.updateQuizPlay(user, quizQuestion.getPoint(), answerRequest.getTimeTaken());
-        }
+        if (playerAnswer.isCorrect())
+            quizPlayService.updatePlayerPoint(user, quizQuestion.getPoint(), answerRequest.getTimeTaken());
+
+        else
+            quizPlayService.updatePlayerQuizStatus(user, QuizPlayStatus.ANSWERED);
 
         return buildAnswerResponse(playerAnswer, correctAnswer);
     }
@@ -137,7 +140,8 @@ public class QuizQuestionAnswerService {
         QuizSeason quizSeason = quizSeasonService.getActiveSeason();
         Optional<QuizPlay> existingPoints = quizPlayRepository.findByUserAndSeason(user, quizSeason);
 
-        if (existingPoints.isPresent() && existingPoints.get().isLocked()) {
+        if (existingPoints.isPresent()
+                && QuizPlayStatus.ANSWERED.equals(existingPoints.get().getStatus())) {
             throw new BadRequestException("You have already played the quiz for today");
         }
     }

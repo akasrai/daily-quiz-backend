@@ -1,5 +1,6 @@
 package com.machpay.api.quiz.repository;
 
+import com.machpay.api.common.enums.QuizPlayStatus;
 import com.machpay.api.entity.QuizPlay;
 import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.entity.User;
@@ -27,6 +28,6 @@ public interface QuizPlayRepository extends JpaRepository<QuizPlay, Long> {
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE QuizPlay q SET q.locked=false WHERE q.season=:quizSeason")
-    void unLockByQuizSeason(@Param("quizSeason") QuizSeason quizSeason);
+    @Query("UPDATE QuizPlay q SET q.status=:status WHERE q.season=:quizSeason")
+    void unLockByQuizSeason(@Param("quizSeason") QuizSeason quizSeason, @Param("status") QuizPlayStatus status);
 }

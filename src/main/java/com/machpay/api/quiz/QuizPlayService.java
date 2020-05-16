@@ -1,5 +1,6 @@
 package com.machpay.api.quiz;
 
+import com.machpay.api.common.enums.QuizPlayStatus;
 import com.machpay.api.common.enums.ResultType;
 import com.machpay.api.common.exception.ResourceNotFoundException;
 import com.machpay.api.entity.Member;
@@ -64,11 +65,7 @@ public class QuizPlayService {
                 User user = userService.findByEmail(userPrincipal.getEmail());
                 Optional<QuizPlay> quizPlay = quizPlayRepository.findByUserAndSeason(user, currentSeason.get());
 
-                if (quizPlay.isPresent()) {
-                    return !quizPlay.get().isLocked();
-                }
-
-                return true;
+                return !quizPlay.isPresent() || QuizPlayStatus.READY_FOR_NEW_PLAY.equals(quizPlay.get().getStatus());
             }
 
             return false;
@@ -78,12 +75,13 @@ public class QuizPlayService {
     }
 
     @Transactional
-    public QuizPlay updateQuizPlay(User user, Long point, Long timeTaken) {
+    public QuizPlay updatePlayerPoint(User user, Long point, Long timeTaken) {
         QuizSeason quizSeason = quizSeasonService.getActiveSeason();
         Optional<QuizPlay> existingPoints = quizPlayRepository.findByUserAndSeason(user, quizSeason);
 
         if (existingPoints.isPresent()) {
             QuizPlay existingQuizPlay = existingPoints.get();
+            existingQuizPlay.setStatus(QuizPlayStatus.ANSWERED);
             existingQuizPlay.setPoint(existingQuizPlay.getPoint() + point);
             existingQuizPlay.setTimeTaken(existingQuizPlay.getTimeTaken() + timeTaken);
 
@@ -101,7 +99,24 @@ public class QuizPlayService {
         if (existingPoints.isPresent()) {
             QuizPlay existingQuizPlay = existingPoints.get();
             existingQuizPlay.setLocked(true);
-            existingQuizPlay.setGamePlayed(existingQuizPlay.getGamePlayed() + 1);
+
+            return quizPlayRepository.save(existingQuizPlay);
+        }
+
+        return createQuizPlay(user, quizSeason);
+    }
+
+    @Transactional
+    public QuizPlay updatePlayerQuizStatus(User user, QuizPlayStatus quizPlayStatus) {
+        QuizSeason quizSeason = quizSeasonService.getActiveSeason();
+        Optional<QuizPlay> existingPoints = quizPlayRepository.findByUserAndSeason(user, quizSeason);
+
+        if (existingPoints.isPresent()) {
+            QuizPlay existingQuizPlay = existingPoints.get();
+            existingQuizPlay.setStatus(quizPlayStatus);
+
+            if (QuizPlayStatus.SEEN_QUESTION.equals(quizPlayStatus))
+                existingQuizPlay.setGamePlayed(existingQuizPlay.getGamePlayed() + 1);
 
             return quizPlayRepository.save(existingQuizPlay);
         }
