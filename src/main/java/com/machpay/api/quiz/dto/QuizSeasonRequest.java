@@ -10,4 +10,8 @@ import javax.validation.constraints.NotNull;
 public class QuizSeasonRequest {
     @NotNull
     private String season;
+
+    private Long duration;
+
+    private String description;
 }

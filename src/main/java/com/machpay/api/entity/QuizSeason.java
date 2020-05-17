@@ -20,6 +20,12 @@ public class QuizSeason extends AuditModel {
     @Column
     private String title;
 
+    @Column
+    private Long duration;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Column(nullable = false)
     private boolean active = false;
 }

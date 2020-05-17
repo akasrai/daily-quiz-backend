@@ -31,8 +31,10 @@ public class QuizSeasonService {
     @Transactional
     public QuizSeason create(QuizSeasonRequest quizSeasonRequest) {
         QuizSeason quizSeason = new QuizSeason();
-        quizSeason.setTitle(quizSeasonRequest.getSeason());
         quizSeason.setActive(true);
+        quizSeason.setTitle(quizSeasonRequest.getSeason());
+        quizSeason.setDuration(quizSeasonRequest.getDuration());
+        quizSeason.setDescription(quizSeasonRequest.getDescription());
 
         return quizSeasonRepository.save(quizSeason);
     }
