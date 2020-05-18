@@ -5,13 +5,13 @@ spring:
     password:
 
   redis:
-    host:
-    port:
+    host: localhost
+    port: 6379
 
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: updatePlayerQuizStatus
+      ddl-auto: update
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties:
       hibernate:
@@ -19,21 +19,22 @@ spring:
   security:
     oauth2:
       client:
+        use-current-uri: false
         registration:
           google:
-            clientId: google_app_id
-            clientSecret: google_app_secret
+            clientId:
+            clientSecret:
             redirectUriTemplate: "{baseUrl}/v1/oauth2/callback/{registrationId}"
             scope:
-              - email
-              - profile
+            - email
+            - profile
           facebook:
-            clientId: facebook_app_id
-            clientSecret: facebook_app_secret
+            clientId:
+            clientSecret:
             redirectUriTemplate: "{baseUrl}/v1/oauth2/callback/{registrationId}"
             scope:
-              - email
-              - public_profile
+            - email
+            - public_profile
 
         provider:
           facebook:
@@ -41,24 +42,24 @@ spring:
             tokenUri: https://graph.FACEBOOK.com/v3.0/oauth/access_token
             userInfoUri: https://graph.FACEBOOK.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email,verified,is_verified,picture.width(250).height(250)
 
+server:
+  servlet:
+  port: 8080
+
 mail:
-  host: smtp.gmail.com
-  port: 587
+  host:
+  port:
   username:
   password:
-  verificationapi: http://localhost:3000/user/verify-email?token=
-  resetpasswordapi: http://localhost:3000/user/reset-password?token=
-  baseUrl: http://localhost:3000/
+  verificationapi:
+  resetpasswordapi:
+  baseUrl:
   properties:
     mail:
       smtp:
-        auth: true
         connectiontimeout: 5000
         timeout: 5000
         writetimeout: 5000
-        starttls:
-          enable: true
-
 twilio:
   accountSid:
   authToken:
@@ -66,20 +67,22 @@ twilio:
 
 app:
   auth:
-    tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
-    tokenExpirationMsec: 864000000
+    tokenSecret:
+    tokenExpirationMsec: 30000
   oauth2:
+    googleClientId:
     # After successfully authenticating with the OAuth2 Provider,
     # we'll be generating an auth token for the member and sending the token to the
     # redirectUri mentioned by the frontend client in the /oauth2/authorize request.
     # We're not using cookies because they won't work well in mobile clients.
     authorizedRedirectUris:
-      - http://localhost:3000/oauth2/redirect
-      - myandroidapp://oauth2/redirect
-      - myiosapp://oauth2/redirect
-  subscriptionsecret: 
 
-server:
-  error:
-    include-stacktrace: neverserver:
-  use-forward-headers: true
+mobile:
+  googleClientId:
+
+logging:
+  file:
+
+firebase:
+  serverKey:
+  apiUrl:
