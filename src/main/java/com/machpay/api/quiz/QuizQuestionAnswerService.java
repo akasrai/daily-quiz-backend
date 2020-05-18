@@ -92,9 +92,7 @@ public class QuizQuestionAnswerService {
     private void notifyPlayers() {
         JSONObject notification = pushNotificationService.getNotificationBody(Constants.NEW_QUIZ_PUBLISHED,
                 Constants.NEW_QUIZ_PUBLISHED_MSG, NotificationTopic.DAILY_QUIZ);
-
         HttpEntity<String> request = new HttpEntity<>(notification.toString());
-
         CompletableFuture<String> pushNotification = pushNotificationService.send(request);
         CompletableFuture.allOf(pushNotification).join();
     }
