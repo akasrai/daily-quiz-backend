@@ -1,5 +1,7 @@
 package com.machpay.api.quiz;
 
+import com.machpay.api.common.Constants;
+import com.machpay.api.common.enums.NotificationTopic;
 import com.machpay.api.common.enums.QuizPlayStatus;
 import com.machpay.api.common.exception.BadRequestException;
 import com.machpay.api.common.exception.ResourceNotFoundException;
@@ -8,6 +10,7 @@ import com.machpay.api.entity.QuizPlay;
 import com.machpay.api.entity.QuizQuestion;
 import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.entity.User;
+import com.machpay.api.notification.PushNotificationService;
 import com.machpay.api.quiz.dto.AnswerRequest;
 import com.machpay.api.quiz.dto.AnswerResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
@@ -17,13 +20,16 @@ import com.machpay.api.quiz.repository.QuizPlayRepository;
 import com.machpay.api.quiz.repository.QuizQuestionRepository;
 import com.machpay.api.security.UserPrincipal;
 import com.machpay.api.user.UserService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +54,9 @@ public class QuizQuestionAnswerService {
 
     @Autowired
     private QuizQuestionRepository quizQuestionRepository;
+
+    @Autowired
+    private PushNotificationService pushNotificationService;
 
     public boolean existBySeason(QuizSeason season) {
         return quizQuestionRepository.existsBySeason(season);
@@ -77,6 +86,17 @@ public class QuizQuestionAnswerService {
 
         quizQuestionRepository.save(quizQuestion);
         createAnswers(quizQuestion, questionRequest.getAnswers());
+        notifyPlayers();
+    }
+
+    private void notifyPlayers() {
+        JSONObject notification = pushNotificationService.getNotificationBody(Constants.NEW_QUIZ_PUBLISHED,
+                Constants.NEW_QUIZ_PUBLISHED_MSG, NotificationTopic.DAILY_QUIZ);
+
+        HttpEntity<String> request = new HttpEntity<>(notification.toString());
+
+        CompletableFuture<String> pushNotification = pushNotificationService.send(request);
+        CompletableFuture.allOf(pushNotification).join();
     }
 
     private void validateAnswers(List<QuestionRequest.Answer> answers) {

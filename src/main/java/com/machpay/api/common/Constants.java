@@ -11,6 +11,8 @@ public final class Constants {
     public static final String PARSE_ERROR = "Something went wrong while parsing /signIn request body";
 
     public static final String INITIAL_QUIZ_SEASON = "The Beginning";
+    public static final String NEW_QUIZ_PUBLISHED ="New Quiz Published";
+    public static final String NEW_QUIZ_PUBLISHED_MSG ="A new quiz is published in Daily Quiz. Please click here play.";
 
     private Constants() {
         throw new IllegalStateException("Constant class");
