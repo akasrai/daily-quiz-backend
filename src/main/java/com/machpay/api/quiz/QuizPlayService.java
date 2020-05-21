@@ -88,7 +88,7 @@ public class QuizPlayService {
             return quizPlayRepository.save(existingQuizPlay);
         }
 
-        return createQuizPlay(user, quizSeason);
+        return createQuizPlay(user, quizSeason, QuizPlayStatus.ANSWERED);
     }
 
     @Transactional
@@ -103,7 +103,7 @@ public class QuizPlayService {
             return quizPlayRepository.save(existingQuizPlay);
         }
 
-        return createQuizPlay(user, quizSeason);
+        return createQuizPlay(user, quizSeason, QuizPlayStatus.ANSWERED);
     }
 
     @Transactional
@@ -121,14 +121,15 @@ public class QuizPlayService {
             return quizPlayRepository.save(existingQuizPlay);
         }
 
-        return createQuizPlay(user, quizSeason);
+        return createQuizPlay(user, quizSeason, quizPlayStatus);
     }
 
     @Transactional
-    public QuizPlay createQuizPlay(User user, QuizSeason quizSeason) {
+    public QuizPlay createQuizPlay(User user, QuizSeason quizSeason, QuizPlayStatus status) {
         QuizPlay quizPlay = new QuizPlay();
         quizPlay.setUser(user);
         quizPlay.setLocked(true);
+        quizPlay.setStatus(status);
         quizPlay.setSeason(quizSeason);
         quizPlay.setPoint(Long.valueOf(0));
         quizPlay.setTimeTaken(Long.valueOf(0));

@@ -106,7 +106,7 @@ public class QuizQuestionAnswerService {
         }
 
         if (correctAnswerCount > 1)
-            throw new BadRequestException("Multiple options cannot be correct");
+            throw new BadRequestException("Multiple options cannot be correct.");
     }
 
     @Transactional
@@ -127,6 +127,7 @@ public class QuizQuestionAnswerService {
 
     public QuestionResponse getLatestQuestion(UserPrincipal userPrincipal) {
         User user = userService.findByEmail(userPrincipal.getEmail());
+        checkIfPlayerIsEligibleForQuiz(user);
         QuizSeason currentSeason = quizSeasonService.getActiveSeason();
         QuizQuestion quizQuestion = quizQuestionRepository.findFirstBySeasonOrderByCreatedAtDesc(currentSeason);
         List<QuizAnswer> quizAnswers = quizAnswerRepository.findAllByQuestion(quizQuestion);
@@ -137,10 +138,23 @@ public class QuizQuestionAnswerService {
         return questionResponse;
     }
 
+    public void checkIfPlayerIsEligibleForQuiz(User user) {
+        QuizSeason quizSeason = quizSeasonService.getActiveSeason();
+        Optional<QuizPlay> existingPoints = quizPlayRepository.findByUserAndSeason(user, quizSeason);
+
+        if (existingPoints.isPresent()
+                && (QuizPlayStatus.SEEN_QUESTION.equals(existingPoints.get().getStatus())
+                || QuizPlayStatus.ANSWERED.equals(existingPoints.get().getStatus()))
+        ) {
+            quizPlayService.updatePlayerQuizStatus(user, QuizPlayStatus.ANSWERED);
+            throw new BadRequestException("You have already played the quiz for today.");
+        }
+    }
+
     @Transactional
     public AnswerResponse checkAnswer(AnswerRequest answerRequest, Long userId) {
         User user = userService.findById(userId);
-        checkIfPlayerIsEligible(user);
+        checkIfPlayerIsEligibleForAnswer(user);
         QuizQuestion quizQuestion = findQuestionById(answerRequest.getQuestion());
         QuizAnswer playerAnswer = findAnswerByQuestionAndId(quizQuestion, answerRequest.getAnswer());
         QuizAnswer correctAnswer = findByQuestionAndCorrectTrue(quizQuestion);
@@ -154,13 +168,13 @@ public class QuizQuestionAnswerService {
         return buildAnswerResponse(playerAnswer, correctAnswer);
     }
 
-    public void checkIfPlayerIsEligible(User user) {
+    public void checkIfPlayerIsEligibleForAnswer(User user) {
         QuizSeason quizSeason = quizSeasonService.getActiveSeason();
         Optional<QuizPlay> existingPoints = quizPlayRepository.findByUserAndSeason(user, quizSeason);
 
         if (existingPoints.isPresent()
                 && QuizPlayStatus.ANSWERED.equals(existingPoints.get().getStatus())) {
-            throw new BadRequestException("You have already played the quiz for today");
+            throw new BadRequestException("You have already played the quiz for today.");
         }
     }
 
