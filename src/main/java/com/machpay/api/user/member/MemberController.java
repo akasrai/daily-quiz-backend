@@ -3,6 +3,7 @@ package com.machpay.api.user.member;
 import com.machpay.api.common.ListResponse;
 import com.machpay.api.security.CurrentUser;
 import com.machpay.api.security.UserPrincipal;
+import com.machpay.api.user.auth.dto.CurrentUserResponse;
 import com.machpay.api.user.member.dto.MemberResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +27,7 @@ public class MemberController {
 
     @GetMapping("")
     @PreAuthorize("hasAnyRole('MEMBER')")
-    public MemberResponse getCurrentMember(@CurrentUser UserPrincipal userPrincipal) {
+    public CurrentUserResponse getCurrentMember(@CurrentUser UserPrincipal userPrincipal) {
         return memberService.getCurrentMember(userPrincipal.getEmail());
     }
 

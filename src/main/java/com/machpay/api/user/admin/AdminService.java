@@ -3,6 +3,7 @@ package com.machpay.api.user.admin;
 import com.machpay.api.common.enums.RoleType;
 import com.machpay.api.common.exception.ResourceNotFoundException;
 import com.machpay.api.entity.Admin;
+import com.machpay.api.user.auth.dto.CurrentUserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,14 +26,14 @@ public class AdminService {
         return adminRepository.existsByEmail(email);
     }
 
-    public AdminResponse getCurrentAdmin(String email) {
+    public CurrentUserResponse getCurrentAdmin(String email) {
         Admin admin = findByEmail(email);
 
-        AdminResponse adminResponse = adminMapper.toAdminResponse(admin);
-        adminResponse.setRoles(admin.getRoles().stream()
+        CurrentUserResponse currentUserResponse = adminMapper.toCurrentUserResponse(admin);
+        currentUserResponse.setRoles(admin.getRoles().stream()
                 .map(role -> RoleType.valueOf(role.getName().toString()).toString().split("_")[1])
                 .collect(Collectors.toList()));
 
-        return adminResponse;
+        return currentUserResponse;
     }
 }

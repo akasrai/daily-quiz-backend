@@ -6,6 +6,7 @@ import com.machpay.api.common.enums.RoleType;
 import com.machpay.api.common.exception.ResourceNotFoundException;
 import com.machpay.api.entity.Member;
 import com.machpay.api.entity.Role;
+import com.machpay.api.user.auth.dto.CurrentUserResponse;
 import com.machpay.api.user.auth.dto.Oauth2SignUpRequest;
 import com.machpay.api.user.auth.dto.SignUpRequest;
 import com.machpay.api.user.member.dto.MemberResponse;
@@ -85,10 +86,10 @@ public class MemberService {
         return memberRepository.save(sender);
     }
 
-    public MemberResponse getCurrentMember(String email) {
+    public CurrentUserResponse getCurrentMember(String email) {
         Member member = findByEmail(email);
 
-        return memberMapper.toMemberResponse(member);
+        return memberMapper.toCurrentUserResponse(member);
     }
 
     public List<MemberResponse> getLockedSenders() {

@@ -2,6 +2,7 @@ package com.machpay.api.user.admin;
 
 import com.machpay.api.security.CurrentUser;
 import com.machpay.api.security.UserPrincipal;
+import com.machpay.api.user.auth.dto.CurrentUserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ public class AdminController {
 
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public AdminResponse getCurrentAdmin(@CurrentUser UserPrincipal userPrincipal) {
+    public CurrentUserResponse getCurrentAdmin(@CurrentUser UserPrincipal userPrincipal) {
         return adminService.getCurrentAdmin(userPrincipal.getEmail());
     }
 }

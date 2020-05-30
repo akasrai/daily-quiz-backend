@@ -10,12 +10,15 @@ import com.machpay.api.redis.AuthTokenService;
 import com.machpay.api.security.TokenProvider;
 import com.machpay.api.security.UserPrincipal;
 import com.machpay.api.user.UserService;
+import com.machpay.api.user.admin.AdminService;
 import com.machpay.api.user.auth.dto.AccessTokenRequest;
 import com.machpay.api.user.auth.dto.AccessTokenResponse;
 import com.machpay.api.user.auth.dto.AuthResponse;
+import com.machpay.api.user.auth.dto.CurrentUserResponse;
 import com.machpay.api.user.auth.dto.SignInRequest;
 import com.machpay.api.user.auth.dto.SignUpRequest;
 import com.machpay.api.user.member.MemberService;
+import com.machpay.api.user.role.RoleService;
 import com.machpay.api.user.verification.ContactVerificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,12 @@ import java.util.stream.Collectors;
 public class AuthService {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private AdminService adminService;
 
     @Autowired
     private MemberService memberService;
@@ -115,5 +124,12 @@ public class AuthService {
         authTokenService.deleteAuthTokenByReferenceToken(accessTokenRequest.getReferenceToken());
 
         return new AccessTokenResponse(referenceToken);
+    }
+
+    public CurrentUserResponse getCurrentUser(UserPrincipal userPrincipal) {
+        if (userService.findByEmail(userPrincipal.getEmail()).getRoles().contains(roleService.findByName(RoleType.ROLE_ADMIN)))
+            return adminService.getCurrentAdmin(userPrincipal.getEmail());
+
+        return memberService.getCurrentMember(userPrincipal.getEmail());
     }
 }

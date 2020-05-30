@@ -6,6 +6,7 @@ import com.machpay.api.security.UserPrincipal;
 import com.machpay.api.user.auth.dto.AccessTokenRequest;
 import com.machpay.api.user.auth.dto.AccessTokenResponse;
 import com.machpay.api.user.auth.dto.AuthResponse;
+import com.machpay.api.user.auth.dto.CurrentUserResponse;
 import com.machpay.api.user.auth.dto.SignInRequest;
 import com.machpay.api.user.auth.dto.SignUpRequest;
 import com.machpay.api.user.password.ForgotPasswordRequest;
@@ -50,6 +51,12 @@ public class AuthController {
     @PostMapping("/users")
     public AuthResponse signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         return authService.signUp(signUpRequest);
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasAnyRole('MEMBER','ADMIN')")
+    public CurrentUserResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
+        return authService.getCurrentUser(userPrincipal);
     }
 
     @GetMapping("/google/{idToken}")
