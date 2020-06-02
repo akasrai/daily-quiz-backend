@@ -3,6 +3,7 @@ package com.machpay.api.quiz;
 import com.machpay.api.common.exception.BadRequestException;
 import com.machpay.api.entity.QuizPlay;
 import com.machpay.api.entity.QuizResult;
+import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.quiz.repository.QuizResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,5 +35,9 @@ public class QuizResultService {
         }
 
         throw new BadRequestException("There's no any result yet");
+    }
+
+    public List<QuizResult> getWinnersBySeason(QuizSeason season) {
+        return quizResultRepository.findTop3BySeasonOrderByPositionAsc(season);
     }
 }

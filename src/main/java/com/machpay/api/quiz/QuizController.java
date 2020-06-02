@@ -1,5 +1,7 @@
 package com.machpay.api.quiz;
 
+import com.machpay.api.common.ListResponse;
+import com.machpay.api.entity.QuizSeason;
 import com.machpay.api.quiz.dto.AnswerRequest;
 import com.machpay.api.quiz.dto.AnswerResponse;
 import com.machpay.api.quiz.dto.CurrentPlayerStatsResponse;
@@ -77,8 +79,20 @@ public class QuizController {
     }
 
     @PostMapping("/host/season")
-    @PreAuthorize(("hasRole('ADMIN')"))
+    @PreAuthorize("hasRole('ADMIN')")
     public void hostNewSeason(@Valid @RequestBody QuizSeasonRequest quizSeasonRequest) {
         quizSeasonService.hostNewSeason(quizSeasonRequest);
+    }
+
+    @GetMapping("/current/season")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    public QuizSeason getCurrentSeason() {
+        return quizSeasonService.getActiveSeason();
+    }
+
+    @GetMapping("/seasons/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ListResponse getAllSeasonInfo() {
+        return new ListResponse(quizSeasonService.getTop10SeasonStats());
     }
 }

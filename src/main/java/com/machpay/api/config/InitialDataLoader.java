@@ -112,8 +112,10 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
     public void createInitialQuizSeason() {
         if (!quizSeasonRepository.existsByTitle(Constants.INITIAL_QUIZ_SEASON)) {
             QuizSeason quizSeason = new QuizSeason();
-            quizSeason.setTitle(Constants.INITIAL_QUIZ_SEASON);
+            quizSeason.setSeason(1);
             quizSeason.setActive(true);
+            quizSeason.setDuration(Long.valueOf("20"));
+            quizSeason.setTitle(Constants.INITIAL_QUIZ_SEASON);
 
             quizSeasonRepository.save(quizSeason);
         }

@@ -213,7 +213,7 @@ public class QuizPlayService {
         }).collect(Collectors.toList());
     }
 
-    private QuizPlayResponse.Player getPlayer(User user) {
+    public QuizPlayResponse.Player getPlayer(User user) {
         QuizPlayResponse.Player player = new QuizPlayResponse.Player();
         Member member = memberService.findById(user.getId());
         player.setName(member.getFullName());

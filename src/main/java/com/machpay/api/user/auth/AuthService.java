@@ -4,6 +4,7 @@ import com.machpay.api.common.enums.ContactType;
 import com.machpay.api.common.enums.RoleType;
 import com.machpay.api.common.exception.BadRequestException;
 import com.machpay.api.entity.Member;
+import com.machpay.api.entity.Role;
 import com.machpay.api.entity.User;
 import com.machpay.api.redis.AuthToken;
 import com.machpay.api.redis.AuthTokenService;
@@ -127,7 +128,9 @@ public class AuthService {
     }
 
     public CurrentUserResponse getCurrentUser(UserPrincipal userPrincipal) {
-        if (userService.findByEmail(userPrincipal.getEmail()).getRoles().contains(roleService.findByName(RoleType.ROLE_ADMIN)))
+        Role admin = roleService.findByName(RoleType.ROLE_ADMIN);
+
+        if (userService.findByEmail(userPrincipal.getEmail()).isRole(admin))
             return adminService.getCurrentAdmin(userPrincipal.getEmail());
 
         return memberService.getCurrentMember(userPrincipal.getEmail());

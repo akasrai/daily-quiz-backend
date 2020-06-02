@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class QuizSeasonRequest {
     @NotNull
-    private String season;
+    private String title;
 
     private Long duration;
 

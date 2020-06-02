@@ -14,7 +14,7 @@ public class QuestionRequest {
     private String question;
 
     @NotNull
-    private Long point;
+    private Long point = Long.valueOf("10");
 
     private String category;
 

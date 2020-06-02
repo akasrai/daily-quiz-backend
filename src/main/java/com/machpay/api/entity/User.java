@@ -74,4 +74,8 @@ public class User extends AuditModel {
             inverseJoinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
+
+    public boolean isRole(Role role) {
+        return this.roles.contains(role);
+    }
 }
