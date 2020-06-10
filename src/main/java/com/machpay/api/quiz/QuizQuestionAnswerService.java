@@ -13,6 +13,7 @@ import com.machpay.api.entity.User;
 import com.machpay.api.notification.PushNotificationService;
 import com.machpay.api.quiz.dto.AnswerRequest;
 import com.machpay.api.quiz.dto.AnswerResponse;
+import com.machpay.api.quiz.dto.CurrentSeasonQuestionResponse;
 import com.machpay.api.quiz.dto.QuestionRequest;
 import com.machpay.api.quiz.dto.QuestionResponse;
 import com.machpay.api.quiz.repository.QuizAnswerRepository;
@@ -184,5 +185,12 @@ public class QuizQuestionAnswerService {
         answerResponse.setCorrectAnswer(correctAnswer.getId());
 
         return answerResponse;
+    }
+
+    public List<CurrentSeasonQuestionResponse> listAllCurrentSeasonQuestion() {
+        QuizSeason currentSeason = quizSeasonService.getActiveSeason();
+        List<QuizQuestion> questions = quizQuestionRepository.findAllBySeasonOrderByCreatedAtDesc(currentSeason);
+
+        return quizMapper.toCurrentSeasonQuestionResponseList(questions);
     }
 }

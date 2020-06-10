@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -50,4 +52,7 @@ public class QuizQuestion extends AuditModel {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private QuizSeason season;
+
+    @OneToMany(mappedBy="question")
+    private Set<QuizAnswer> answers;
 }

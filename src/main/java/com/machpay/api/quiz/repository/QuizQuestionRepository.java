@@ -5,6 +5,7 @@ import com.machpay.api.entity.QuizSeason;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,4 +16,6 @@ public interface QuizQuestionRepository extends JpaRepository<QuizQuestion, Long
     Optional<QuizQuestion> findById(UUID id);
 
     boolean existsBySeason(QuizSeason season);
+
+    List<QuizQuestion> findAllBySeasonOrderByCreatedAtDesc(QuizSeason quizSeason);
 }

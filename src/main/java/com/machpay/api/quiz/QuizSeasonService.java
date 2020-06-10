@@ -98,9 +98,9 @@ public class QuizSeasonService {
             top10SeasonStatsResponse.setDuration(season.getDuration());
             top10SeasonStatsResponse.setWinners(getWinnersBySeason(season));
             top10SeasonStatsResponse.setDescription(season.getDescription());
-            top10SeasonStatsResponse.setCreatedAt(new SimpleDateFormat("yyyy-MM-dd").format(season.getCreatedAt()));
-            top10SeasonStatsResponse.setUpdatedAt(new SimpleDateFormat("yyyy-MM-dd").format(season.getUpdatedAt()));
-            top10SeasonStatsResponse.setEndsAt(new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(season.getCreatedAt(),
+            top10SeasonStatsResponse.setCreatedAt(new SimpleDateFormat("MMM dd, YYYY").format(season.getCreatedAt()));
+            top10SeasonStatsResponse.setUpdatedAt(new SimpleDateFormat("MMM dd, YYYY").format(season.getUpdatedAt()));
+            top10SeasonStatsResponse.setEndsAt(new SimpleDateFormat("MMM dd, YYYY").format(DateUtils.addDays(season.getCreatedAt(),
                     season.getDuration().intValue())));
 
             return top10SeasonStatsResponse;

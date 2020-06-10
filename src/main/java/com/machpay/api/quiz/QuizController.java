@@ -95,4 +95,10 @@ public class QuizController {
     public ListResponse getAllSeasonInfo() {
         return new ListResponse(quizSeasonService.getTop10SeasonStats());
     }
+
+    @GetMapping("/current/season/questions")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ListResponse getAllCurrentSeasonQuestion() {
+        return new ListResponse(quizQuestionAnswerService.listAllCurrentSeasonQuestion());
+    }
 }
