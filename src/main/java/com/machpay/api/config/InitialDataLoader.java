@@ -16,7 +16,7 @@ import com.machpay.api.user.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,9 +42,6 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 
     @Autowired
     private PrivilegeRepository privilegeRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private QuizSeasonRepository quizSeasonRepository;
@@ -79,7 +76,7 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
             admin.setFirstName("Super");
             admin.setLastName("Admin");
             admin.setProvider(AuthProvider.SYSTEM);
-            admin.setPassword(passwordEncoder.encode("3MtkS-#Vk?2?Ek3B"));
+            admin.setPassword(new BCryptPasswordEncoder().encode("3MtkS-#Vk?2?Ek3B"));
             admin.setRoles(new ArrayList<>(Collections.singletonList(adminRole)));
             adminRepository.save(admin);
         }
